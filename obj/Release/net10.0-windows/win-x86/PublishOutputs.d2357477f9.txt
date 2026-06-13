@@ -1,0 +1,8 @@
+D:\projects\CommMate\bin\Release\net10.0-windows\publish\win-x86\CommMate.exe
+D:\projects\CommMate\bin\Release\net10.0-windows\publish\win-x86\CommMate.dll
+D:\projects\CommMate\bin\Release\net10.0-windows\publish\win-x86\CommMate.deps.json
+D:\projects\CommMate\bin\Release\net10.0-windows\publish\win-x86\CommMate.runtimeconfig.json
+D:\projects\CommMate\bin\Release\net10.0-windows\publish\win-x86\CommMate.pdb
+D:\projects\CommMate\bin\Release\net10.0-windows\publish\win-x86\CommunityToolkit.Mvvm.dll
+D:\projects\CommMate\bin\Release\net10.0-windows\publish\win-x86\System.IO.Ports.dll
+D:\projects\CommMate\bin\Release\net10.0-windows\publish\win-x86\System.Management.dll

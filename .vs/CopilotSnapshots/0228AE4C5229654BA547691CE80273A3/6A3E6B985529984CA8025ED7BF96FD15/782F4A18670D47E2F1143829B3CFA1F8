@@ -1,0 +1,117 @@
+﻿using System.IO.Ports;
+using System.Text;
+using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommMate.Models;
+using CommMate.Services;
+
+namespace CommMate.ViewModels;
+
+public partial class TerminalViewModel : ObservableObject
+{
+    private readonly SerialPortService _serial = new();
+    private readonly TerminalEmulator _terminal = new(80, 24);
+
+    [ObservableProperty] private string _selectedPort = "";
+    [ObservableProperty] private int _selectedBaudRate = 115200;
+    [ObservableProperty] private int _selectedBaudIndex = 7;
+    [ObservableProperty] private bool _isConnected;
+    [ObservableProperty] private bool _localEcho = true;
+    [ObservableProperty] private string _statusText = "";
+    [ObservableProperty] private int _fontSize = 14;
+
+    public event Action<string>? OnTerminalOutput;
+    public event Action<byte[]>? OnDataToSend;
+
+    public System.Collections.ObjectModel.ObservableCollection<string> PortNames { get; } = new();
+    public int[] BaudRates { get; } = { 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 56000, 57600, 115200, 128000, 256000, 460800, 921600 };
+
+    public TerminalViewModel()
+    {
+        StatusText = I18nService.Instance.T("Status.Ready");
+        _serial.DataReceived += OnDataReceived;
+        _serial.ErrorOccurred += OnError;
+        _serial.ConnectionChanged += OnConnectionChanged;
+        _terminal.OnBeep += _ => System.Media.SystemSounds.Beep.Play();
+        RefreshPorts();
+    }
+
+    private void OnDataReceived(byte[] data)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            _terminal.ProcessData(data);
+            var content = _terminal.GetVisibleContent();
+            OnTerminalOutput?.Invoke(string.Join("\r\n", content));
+        });
+    }
+
+    private void OnError(string msg) { }
+
+    private void OnConnectionChanged(bool connected)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            IsConnected = connected;
+            StatusText = connected
+                ? $"{I18nService.Instance.T("Status.Connected")} ({SelectedPort} @ {SelectedBaudRate})"
+                : I18nService.Instance.T("Status.Disconnected");
+        });
+    }
+
+    [RelayCommand]
+    public void RefreshPorts()
+    {
+        PortNames.Clear();
+        foreach (var port in _serial.GetAvailablePorts())
+            PortNames.Add(port);
+    }
+
+    [RelayCommand]
+    public async Task ConnectDisconnect()
+    {
+        if (IsConnected)
+        {
+            await _serial.CloseAsync();
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(SelectedPort)) return;
+
+            _serial.Config.PortName = SelectedPort;
+            _serial.Config.BaudRate = SelectedBaudRate;
+            _serial.Config.DataBits = 8;
+            _serial.Config.StopBits = StopBits.One;
+            _serial.Config.Parity = Parity.None;
+            _serial.Config.FlowControl = Handshake.None;
+            _serial.Config.NewLine = "\r";
+            _serial.Open();
+            _terminal.ClearScreen();
+        }
+    }
+
+    public void SendKeyInput(string text)
+    {
+        if (!IsConnected) return;
+        var data = Encoding.ASCII.GetBytes(text);
+        _serial.Send(data);
+        if (LocalEcho)
+        {
+            _terminal.ProcessData(data);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var content = _terminal.GetVisibleContent();
+                OnTerminalOutput?.Invoke(string.Join("\r\n", content));
+            });
+        }
+        OnDataToSend?.Invoke(data);
+    }
+
+    [RelayCommand]
+    public void ClearScreen()
+    {
+        _terminal.ClearScreen();
+        OnTerminalOutput?.Invoke(string.Empty);
+    }
+}

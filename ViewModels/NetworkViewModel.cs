@@ -1,0 +1,331 @@
+using System.Collections.ObjectModel;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Text;
+using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommMate.Models;
+using CommMate.Services;
+using Microsoft.Win32;
+
+namespace CommMate.ViewModels;
+
+public partial class NetworkViewModel : ObservableObject, IDisposable
+{
+    private readonly NetworkService _network = new();
+    private readonly LogService _log = new();
+    private long _totalSent;
+    private long _totalRecv;
+    // 缓存 UI 线程的 Dispatcher
+    private readonly System.Windows.Threading.Dispatcher _dispatcher =
+        System.Windows.Application.Current?.Dispatcher ?? System.Windows.Threading.Dispatcher.CurrentDispatcher;
+    private bool _disposed;
+
+    public LogService Log => _log;
+
+    [ObservableProperty] private int _selectedModeIndex;
+    [ObservableProperty] private string _remoteHost = "127.0.0.1";
+    [ObservableProperty] private int _remotePort = 8080;
+    [ObservableProperty] private int _localPort = 8080;
+    [ObservableProperty] private bool _enableBroadcast;
+    [ObservableProperty] private bool _isConnected;
+    [ObservableProperty] private bool _isListening;
+    [ObservableProperty] private bool _isHex;
+    [ObservableProperty] private bool _appendNewLine = false;
+    [ObservableProperty] private bool _showTimestamp = true;
+    [ObservableProperty] private bool _autoScroll = true;
+    [ObservableProperty] private string _sendText = "";
+    [ObservableProperty] private string _statusText = "";
+    [ObservableProperty] private string _txBytesText = "TX: 0";
+    [ObservableProperty] private string _rxBytesText = "RX: 0";
+    [ObservableProperty] private int _clientCount;
+    [ObservableProperty] private string _clientCountText = "Clients: 0";
+    [ObservableProperty] private int _selectedNewLineIndex;
+    [ObservableProperty] private string _buttonText = "Connect";
+    [ObservableProperty] private int _selectedLocalIPIndex;
+
+    public string[] ModeOptions { get; } = { "TCP Client", "TCP Server", "UDP" };
+    public string[] NewLineOptions { get; } = { "\\r\\n", "\\n", "\\r" };
+    public ObservableCollection<string> LocalIPs { get; } = new();
+    public ObservableCollection<NetworkClientInfo> ConnectedClients { get; } = new();
+
+    public NetworkViewModel()
+    {
+        StatusText = I18nService.Instance.T("Status.Ready");
+        _network.DataReceived += OnDataReceived;
+        _network.ErrorOccurred += OnError;
+        _network.ConnectionChanged += OnConnectionChanged;
+        _network.ClientCountChanged += HandleClientCountChanged;
+        _network.ClientConnected += HandleClientConnected;
+        _network.ClientDisconnected += HandleClientDisconnected;
+        
+        ScanLocalIPs();
+        UpdateButtonText();
+    }
+
+    partial void OnShowTimestampChanged(bool oldValue, bool newValue)
+    {
+        _log.ShowTimestamp = newValue;
+    }
+
+    partial void OnIsHexChanged(bool oldValue, bool newValue)
+    {
+        _log.IsHex = newValue;
+    }
+
+    partial void OnSelectedModeIndexChanged(int value)
+    {
+        UpdateButtonText();
+    }
+
+    partial void OnIsConnectedChanged(bool value)
+    {
+        UpdateButtonText();
+        if (!value)
+        {
+            _dispatcher.Invoke(() => ConnectedClients.Clear());
+        }
+    }
+
+    private void UpdateButtonText()
+    {
+        ButtonText = SelectedModeIndex == 1 // TCP Server
+            ? (IsConnected ? "Stop" : "Listen")
+            : (IsConnected ? "Disconnect" : "Connect");
+    }
+
+    private void ScanLocalIPs()
+    {
+        LocalIPs.Clear();
+        LocalIPs.Add("0.0.0.0 (All Interfaces)");
+        
+        try
+        {
+            foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (ni.OperationalStatus != OperationalStatus.Up)
+                    continue;
+                
+                foreach (var addr in ni.GetIPProperties().UnicastAddresses)
+                {
+                    if (addr.Address.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        LocalIPs.Add(addr.Address.ToString());
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"扫描本地IP失败: {ex.Message}");
+        }
+        
+        SelectedLocalIPIndex = 0;
+    }
+
+    private string GetBindAddress()
+    {
+        if (SelectedLocalIPIndex <= 0 || SelectedLocalIPIndex >= LocalIPs.Count)
+            return "0.0.0.0";
+        
+        var selected = LocalIPs[SelectedLocalIPIndex];
+        return selected.Replace(" (All Interfaces)", "");
+    }
+
+    private void OnDataReceived(byte[] data, string? clientId)
+    {
+        _dispatcher.Invoke(() =>
+        {
+            var channel = clientId ?? "NET";
+            _log.AddEntry(DataDirection.Received, data, channel);
+            _totalRecv += data.Length;
+            RxBytesText = $"RX: {_totalRecv}";
+        });
+    }
+
+    private void OnError(string msg)
+    {
+        _dispatcher.Invoke(() => _log.AddSystemMessage(msg));
+    }
+
+    private void OnConnectionChanged(bool connected)
+    {
+        _dispatcher.Invoke(() =>
+        {
+            IsConnected = connected;
+            IsListening = _network.IsListening;
+            StatusText = connected
+                ? I18nService.Instance.T("Status.Connected")
+                : I18nService.Instance.T("Status.Disconnected");
+        });
+    }
+
+    private void HandleClientCountChanged(int count)
+    {
+        _dispatcher.Invoke(() =>
+        {
+            ClientCount = count;
+            ClientCountText = $"Clients: {count}";
+        });
+    }
+
+    private void HandleClientConnected(NetworkClientInfo info)
+    {
+        _dispatcher.Invoke(() =>
+        {
+            ConnectedClients.Add(info);
+        });
+    }
+
+    private void HandleClientDisconnected(string clientId)
+    {
+        _dispatcher.Invoke(() =>
+        {
+            var item = ConnectedClients.FirstOrDefault(c => c.Id == clientId);
+            if (item != null)
+                ConnectedClients.Remove(item);
+        });
+    }
+
+    [RelayCommand]
+    public async Task ConnectDisconnect()
+    {
+        if (IsConnected)
+        {
+            await _network.DisconnectAsync();
+        }
+        else
+        {
+            _network.Config.Mode = (NetworkMode)SelectedModeIndex;
+            _network.Config.RemoteHost = RemoteHost;
+            _network.Config.RemotePort = RemotePort;
+            _network.Config.LocalPort = LocalPort;
+            _network.Config.LocalBindAddress = GetBindAddress();
+            _network.Config.EnableBroadcast = EnableBroadcast;
+            _network.Config.NewLine = SelectedNewLineIndex switch { 1 => "\n", 2 => "\r", _ => "\r\n" };
+
+            _totalSent = 0;
+            _totalRecv = 0;
+            TxBytesText = "TX: 0";
+            RxBytesText = "RX: 0";
+
+            await _network.ConnectAsync();
+        }
+    }
+
+    [RelayCommand]
+    public async Task Send()
+    {
+        if (!IsConnected || string.IsNullOrEmpty(SendText)) return;
+
+        byte[] data;
+        if (IsHex)
+        {
+            try
+            {
+                data = HexHelper.HexStringToBytes(SendText);
+            }
+            catch
+            {
+                _log.AddSystemMessage("Hex 格式无效");
+                return;
+            }
+        }
+        else
+        {
+            var text = SendText;
+            if (AppendNewLine)
+            {
+                text = SelectedNewLineIndex switch { 1 => text + "\n", 2 => text + "\r", _ => text + "\r\n" };
+            }
+            data = Encoding.UTF8.GetBytes(text);
+        }
+
+        if (await _network.SendAsync(data))
+        {
+            _log.AddEntry(DataDirection.Sent, data, "NET");
+            _totalSent += data.Length;
+            TxBytesText = $"TX: {_totalSent}";
+        }
+    }
+
+    [RelayCommand]
+    public void DisconnectClient(string? clientId)
+    {
+        if (string.IsNullOrEmpty(clientId)) return;
+        _network.DisconnectClient(clientId);
+    }
+
+    [RelayCommand]
+    public void ClearData() => _log.Clear();
+
+    [RelayCommand]
+    public void SaveLog()
+    {
+        var dialog = new SaveFileDialog
+        {
+            Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*",
+            DefaultExt = "txt",
+            FileName = $"CommMate_Log_{DateTime.Now:yyyyMMdd_HHmmss}.txt"
+        };
+        if (dialog.ShowDialog() == true)
+        {
+            _log.SaveToFile(dialog.FileName);
+            _log.AddSystemMessage($"Log saved: {dialog.FileName}");
+        }
+    }
+
+    public void ApplyConfig(AppConfig config)
+    {
+        if (config == null) return;
+
+        SelectedModeIndex = config.NetworkModeIndex;
+        RemoteHost = config.NetworkRemoteHost;
+        RemotePort = config.NetworkRemotePort;
+        LocalPort = config.NetworkLocalPort;
+        EnableBroadcast = config.NetworkEnableBroadcast;
+
+        var ipIndex = LocalIPs.IndexOf(config.NetworkLocalBindAddress);
+        if (ipIndex >= 0) SelectedLocalIPIndex = ipIndex;
+
+        IsHex = config.NetworkIsHex;
+        ShowTimestamp = config.NetworkShowTimestamp;
+        AutoScroll = config.NetworkAutoScroll;
+        AppendNewLine = config.NetworkAppendNewLine;
+        SelectedNewLineIndex = config.NetworkSelectedNewLineIndex;
+    }
+
+    public void UpdateConfig(AppConfig config)
+    {
+        if (config == null) return;
+
+        config.NetworkModeIndex = SelectedModeIndex;
+        config.NetworkRemoteHost = RemoteHost;
+        config.NetworkRemotePort = RemotePort;
+        config.NetworkLocalPort = LocalPort;
+        config.NetworkLocalBindAddress = GetBindAddress();
+        config.NetworkEnableBroadcast = EnableBroadcast;
+        config.NetworkIsHex = IsHex;
+        config.NetworkShowTimestamp = ShowTimestamp;
+        config.NetworkAutoScroll = AutoScroll;
+        config.NetworkAppendNewLine = AppendNewLine;
+        config.NetworkSelectedNewLineIndex = SelectedNewLineIndex;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        _network.DataReceived -= OnDataReceived;
+        _network.ErrorOccurred -= OnError;
+        _network.ConnectionChanged -= OnConnectionChanged;
+        _network.ClientCountChanged -= HandleClientCountChanged;
+        _network.ClientConnected -= HandleClientConnected;
+        _network.ClientDisconnected -= HandleClientDisconnected;
+
+        _network.Dispose();
+    }
+}

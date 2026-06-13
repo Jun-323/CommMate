@@ -1,0 +1,236 @@
+﻿using System.IO.Ports;
+using System.Management;
+using CommMate.Models;
+
+namespace CommMate.Services;
+
+public class SerialPortService : IDisposable
+{
+    private SerialPort? _serialPort;
+    private CancellationTokenSource? _readCts;
+    private ManagementEventWatcher? _portWatcher;
+    private bool _disposed;
+
+    public bool IsOpen => _serialPort?.IsOpen ?? false;
+    public SerialConfig Config { get; } = new();
+
+    public event Action<byte[]>? DataReceived;
+    public event Action<string>? ErrorOccurred;
+    public event Action<bool>? ConnectionChanged;
+    public event Action<string[]>? PortsChanged;
+
+    public string[] GetAvailablePorts()
+    {
+        return SerialPort.GetPortNames();
+    }
+
+    public void Open()
+    {
+        try
+        {
+            _serialPort = new SerialPort(Config.PortName, Config.BaudRate, Config.Parity, Config.DataBits, Config.StopBits)
+            {
+                Handshake = Config.FlowControl,
+                ReadTimeout = 500,
+                WriteTimeout = 500,
+                NewLine = Config.NewLine
+            };
+
+            _serialPort.ErrorReceived += OnErrorReceived;
+            _serialPort.Open();
+
+            _readCts = new CancellationTokenSource();
+            _ = Task.Run(() => ReadLoop(_readCts.Token));
+
+            ConnectionChanged?.Invoke(true);
+        }
+        catch (Exception ex)
+        {
+            ErrorOccurred?.Invoke($"打开串口失败: {ex.Message}");
+            _serialPort?.Dispose();
+            _serialPort = null;
+        }
+    }
+
+    public void Close()
+    {
+        _readCts?.Cancel();
+        try
+        {
+            _serialPort?.Close();
+        }
+        catch (Exception ex)
+        {
+            ErrorOccurred?.Invoke($"关闭串口异常: {ex.Message}");
+        }
+        _serialPort?.Dispose();
+        _serialPort = null;
+        ConnectionChanged?.Invoke(false);
+    }
+
+    public bool Send(byte[] data)
+    {
+        if (_serialPort?.IsOpen != true) return false;
+        try
+        {
+            _serialPort.Write(data, 0, data.Length);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorOccurred?.Invoke($"发送失败: {ex.Message}");
+            return false;
+        }
+    }
+
+    private async Task ReadLoop(CancellationToken ct)
+    {
+        var mode = Config.FramingMode;
+
+        if (mode == FramingMode.Streaming)
+        {
+            await ReadLoop_Streaming(ct);
+        }
+        else
+        {
+            await ReadLoop_Timeout(ct);
+        }
+    }
+
+    /// <summary>流模式：有数据立即读出，不做缓存/拼包。适合连续数据传输。</summary>
+    private async Task ReadLoop_Streaming(CancellationToken ct)
+    {
+        var buffer = new byte[4096];
+        while (!ct.IsCancellationRequested)
+        {
+            try
+            {
+                if (_serialPort?.IsOpen == true && _serialPort.BytesToRead > 0)
+                {
+                    var count = _serialPort.Read(buffer, 0, Math.Min(buffer.Length, _serialPort.BytesToRead));
+                    if (count > 0)
+                    {
+                        var data = new byte[count];
+                        Array.Copy(buffer, data, count);
+                        DataReceived?.Invoke(data);
+                    }
+                }
+                await Task.Delay(10, ct);
+            }
+            catch (OperationCanceledException) { break; }
+            catch (TimeoutException) { }
+            catch (Exception ex)
+            {
+                ErrorOccurred?.Invoke($"读取错误: {ex.Message}");
+                break;
+            }
+        }
+    }
+
+    /// <summary>超时帧模式：累积字节，隔 PacketTimeout ms 无新数据后作为一包发出。</summary>
+    private async Task ReadLoop_Timeout(CancellationToken ct)
+    {
+        var readBuffer = new byte[4096];
+        var accumulated = new List<byte>(4096);
+        var gapTimer = new System.Diagnostics.Stopwatch();
+        var timeout = Config.PacketTimeout;
+
+        void Flush()
+        {
+            if (accumulated.Count == 0) return;
+            var packet = accumulated.ToArray();
+            accumulated.Clear();
+            gapTimer.Reset();
+            DataReceived?.Invoke(packet);
+        }
+
+        while (!ct.IsCancellationRequested)
+        {
+            try
+            {
+                if (_serialPort?.IsOpen == true && _serialPort.BytesToRead > 0)
+                {
+                    var available = Math.Min(readBuffer.Length, _serialPort.BytesToRead);
+                    var count = _serialPort.Read(readBuffer, 0, available);
+                    if (count > 0)
+                    {
+                        accumulated.AddRange(new ArraySegment<byte>(readBuffer, 0, count));
+                        gapTimer.Restart();
+                    }
+                }
+                else if (accumulated.Count > 0 && gapTimer.IsRunning && gapTimer.ElapsedMilliseconds >= timeout)
+                {
+                    Flush();
+                }
+
+                if (accumulated.Count > 65536)
+                {
+                    Flush();
+                }
+
+                await Task.Delay(10, ct);
+            }
+            catch (OperationCanceledException) { break; }
+            catch (TimeoutException) { }
+            catch (Exception ex)
+            {
+                if (accumulated.Count > 0) Flush();
+                ErrorOccurred?.Invoke($"读取错误: {ex.Message}");
+                break;
+            }
+        }
+
+        if (accumulated.Count > 0) Flush();
+    }
+
+    private void OnErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+    {
+        ErrorOccurred?.Invoke($"串口错误: {e.EventType}");
+    }
+
+    public void StartPortMonitoring()
+    {
+        // 先停掉已有的 watcher，防止重复启动
+        StopPortMonitoring();
+
+        try
+        {
+            _portWatcher = new ManagementEventWatcher(
+                new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent"));
+            _portWatcher.EventArrived += (s, e) =>
+            {
+                System.Threading.Thread.Sleep(500);
+                PortsChanged?.Invoke(GetAvailablePorts());
+            };
+            _portWatcher.Start();
+        }
+        catch
+        {
+            // WMI may not be available, fallback silently
+        }
+    }
+
+    public void StopPortMonitoring()
+    {
+        try
+        {
+            _portWatcher?.Stop();
+            _portWatcher?.Dispose();
+        }
+        catch
+        {
+            // 忽略停止时的异常
+        }
+        _portWatcher = null;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        StopPortMonitoring();
+        _readCts?.Cancel();
+        _readCts?.Dispose();
+        _serialPort?.Dispose();
+    }
+}
