@@ -1,0 +1,2 @@
+D:\projects\CommMate\bin\Release\net10.0-windows\win-x64\publish\CommMate.pdb
+D:\projects\CommMate\bin\Release\net10.0-windows\win-x64\publish\CommMate.exe

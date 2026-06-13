@@ -1,0 +1,86 @@
+{
+  "QuickCommands": [
+    {
+      "CommandText": "ATI",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BCSQ",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BQENG=\u0022servingcell\u0022",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BCGMI",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BCGMM",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BCGSN",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BCREG?",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BCOPS?",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BQNWINFO",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BCPIN?",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BCGATT?",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BCGPADDR=1",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BQIACT?",
+      "IsHex": false
+    },
+    {
+      "CommandText": "AT\u002BQCFG=\u0022band\u0022",
+      "IsHex": false
+    }
+  ],
+  "SerialPortName": "COM34",
+  "SerialBaudRate": 115200,
+  "SerialParity": "None",
+  "SerialDataBits": 8,
+  "SerialStopBits": "One",
+  "SerialFlowControl": "None",
+  "SerialFramingMode": "Timeout",
+  "SerialPacketTimeout": 50,
+  "SerialIsHex": false,
+  "SerialShowTimestamp": true,
+  "SerialAutoScroll": true,
+  "SerialAppendNewLine": false,
+  "SerialSelectedNewLineIndex": 0,
+  "NetworkModeIndex": 1,
+  "NetworkRemoteHost": "127.0.0.1",
+  "NetworkRemotePort": 8080,
+  "NetworkLocalPort": 8080,
+  "NetworkLocalBindAddress": "192.168.0.101",
+  "NetworkEnableBroadcast": false,
+  "NetworkIsHex": false,
+  "NetworkShowTimestamp": true,
+  "NetworkAutoScroll": true,
+  "NetworkAppendNewLine": false,
+  "NetworkSelectedNewLineIndex": 0,
+  "IsDarkTheme": false,
+  "Language": "zh"
+}

@@ -1,0 +1,304 @@
+﻿using System.Collections.Concurrent;
+using System.Net;
+using System.Net.Sockets;
+using CommMate.Models;
+
+namespace CommMate.Services;
+
+public class NetworkService : IDisposable
+{
+    private TcpClient? _tcpClient;
+    private TcpListener? _tcpListener;
+    private UdpClient? _udpClient;
+    private CancellationTokenSource? _cts;
+    private readonly ConcurrentDictionary<string, TcpClient> _tcpClients = new();
+    private readonly ConcurrentDictionary<string, NetworkClientInfo> _clientInfos = new();
+    private IPEndPoint? _lastUdpRemoteEndPoint;
+    private bool _disposed;
+
+    public bool IsConnected { get; private set; }
+    public bool IsListening { get; private set; }
+    public int ClientCount => _tcpClients.Count;
+    public NetworkConfig Config { get; } = new();
+    
+    public IReadOnlyCollection<NetworkClientInfo> ClientInfos => _clientInfos.Values.ToList().AsReadOnly();
+
+    public event Action<byte[], string?>? DataReceived;
+    public event Action<string>? ErrorOccurred;
+    public event Action<bool>? ConnectionChanged;
+    public event Action<int>? ClientCountChanged;
+    public event Action<NetworkClientInfo>? ClientConnected;
+    public event Action<string>? ClientDisconnected;
+
+    public async Task ConnectAsync()
+    {
+        try
+        {
+            _cts = new CancellationTokenSource();
+
+            switch (Config.Mode)
+            {
+                case NetworkMode.TcpClient:
+                    await ConnectTcpClientAsync(_cts.Token);
+                    break;
+                case NetworkMode.TcpServer:
+                    await StartTcpServerAsync(_cts.Token);
+                    break;
+                case NetworkMode.Udp:
+                    StartUdp(_cts.Token);
+                    break;
+            }
+
+            IsConnected = true;
+            ConnectionChanged?.Invoke(true);
+        }
+        catch (Exception ex)
+        {
+            ErrorOccurred?.Invoke($"连接失败: {ex.Message}");
+        }
+    }
+
+    private async Task ConnectTcpClientAsync(CancellationToken ct)
+    {
+        var localAddr = ResolveLocalBindAddress();
+        if (localAddr != null && !IPAddress.Any.Equals(localAddr))
+        {
+            _tcpClient = new TcpClient(new IPEndPoint(localAddr, 0));
+        }
+        else
+        {
+            _tcpClient = new TcpClient();
+        }
+        await _tcpClient.ConnectAsync(Config.RemoteHost, Config.RemotePort, ct);
+        _ = Task.Run(() => ReadTcpStream(_tcpClient.GetStream(), "TCP", ct), ct);
+    }
+
+    private async Task StartTcpServerAsync(CancellationToken ct)
+    {
+        var localAddr = ResolveLocalBindAddress();
+        _tcpListener = new TcpListener(localAddr ?? IPAddress.Any, Config.LocalPort);
+        _tcpListener.Start();
+        IsListening = true;
+
+        _ = Task.Run(async () =>
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                try
+                {
+                    var client = await _tcpListener.AcceptTcpClientAsync(ct);
+                    var id = Guid.NewGuid().ToString()[..8];
+                    var remoteEp = client.Client.RemoteEndPoint?.ToString() ?? "Unknown";
+                    
+                    _tcpClients[id] = client;
+                    var info = new NetworkClientInfo
+                    {
+                        Id = id,
+                        RemoteEndPoint = remoteEp,
+                        ConnectedTime = DateTime.Now
+                    };
+                    _clientInfos[id] = info;
+                    
+                    ClientCountChanged?.Invoke(_tcpClients.Count);
+                    ClientConnected?.Invoke(info);
+                    
+                    _ = Task.Run(() => ReadTcpStream(client.GetStream(), id, ct), ct);
+                }
+                catch (OperationCanceledException) { break; }
+                catch (Exception ex)
+                {
+                    ErrorOccurred?.Invoke($"TCP Server 接受客户端失败: {ex.Message}");
+                    // 仅退出当前 accept 循环，不break整个监听
+                }
+            }
+        }, ct);
+    }
+
+    private void StartUdp(CancellationToken ct)
+    {
+        var localAddr = ResolveLocalBindAddress();
+        if (localAddr != null && !IPAddress.Any.Equals(localAddr))
+        {
+            _udpClient = new UdpClient(new IPEndPoint(localAddr, Config.LocalPort));
+        }
+        else
+        {
+            _udpClient = new UdpClient(Config.LocalPort);
+        }
+        if (Config.EnableBroadcast)
+            _udpClient.EnableBroadcast = true;
+        _ = Task.Run(() => ReadUdpLoop(ct), ct);
+    }
+
+    private IPAddress? ResolveLocalBindAddress()
+    {
+        if (string.IsNullOrEmpty(Config.LocalBindAddress) || Config.LocalBindAddress == "0.0.0.0")
+            return IPAddress.Any;
+        
+        if (IPAddress.TryParse(Config.LocalBindAddress, out var addr))
+            return addr;
+        
+        return IPAddress.Any;
+    }
+
+    private async Task ReadTcpStream(NetworkStream stream, string clientId, CancellationToken ct)
+    {
+        var buffer = new byte[4096];
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                var count = await stream.ReadAsync(buffer, ct);
+                if (count == 0) break;
+                var data = new byte[count];
+                Array.Copy(buffer, data, count);
+                DataReceived?.Invoke(data, clientId);
+            }
+        }
+        catch (OperationCanceledException) { }
+        catch { }
+        finally
+        {
+            RemoveClient(clientId);
+        }
+    }
+
+    private void RemoveClient(string clientId)
+    {
+        if (_tcpClients.TryRemove(clientId, out var tcpClient))
+        {
+            try { tcpClient.Close(); }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"关闭客户端连接异常: {ex.Message}");
+            }
+        }
+        if (_clientInfos.TryRemove(clientId, out _))
+        {
+            ClientDisconnected?.Invoke(clientId);
+        }
+        ClientCountChanged?.Invoke(_tcpClients.Count);
+    }
+
+    private async Task ReadUdpLoop(CancellationToken ct)
+    {
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                var result = await _udpClient!.ReceiveAsync(ct);
+                _lastUdpRemoteEndPoint = result.RemoteEndPoint;
+                DataReceived?.Invoke(result.Buffer, result.RemoteEndPoint.ToString());
+            }
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    public async Task<bool> SendAsync(byte[] data)
+    {
+        try
+        {
+            switch (Config.Mode)
+            {
+                case NetworkMode.TcpClient:
+                    if (_tcpClient?.Connected == true)
+                    {
+                        await _tcpClient.GetStream().WriteAsync(data);
+                        return true;
+                    }
+                    break;
+                case NetworkMode.TcpServer:
+                    var anySent = false;
+                    foreach (var (clientId, client) in _tcpClients.ToArray())
+                    {
+                        try
+                        {
+                            if (client.Connected)
+                            {
+                                await client.GetStream().WriteAsync(data);
+                                anySent = true;
+                            }
+                        }
+                        catch
+                        {
+                            // 单客户端发送失败，移除并继续
+                            RemoveClient(clientId);
+                        }
+                    }
+                    return anySent;
+                case NetworkMode.Udp:
+                    if (_udpClient != null)
+                    {
+                        // 优先回复最近收到数据的来源，否则用配置的 RemoteHost
+                        if (_lastUdpRemoteEndPoint != null)
+                        {
+                            await _udpClient.SendAsync(data, data.Length, _lastUdpRemoteEndPoint);
+                        }
+                        else
+                        {
+                            await _udpClient.SendAsync(data, data.Length, Config.RemoteHost, Config.RemotePort);
+                        }
+                        return true;
+                    }
+                    break;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            ErrorOccurred?.Invoke($"发送失败: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task SendToClientAsync(string clientId, byte[] data)
+    {
+        try
+        {
+            if (_tcpClients.TryGetValue(clientId, out var client) && client.Connected)
+            {
+                await client.GetStream().WriteAsync(data);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorOccurred?.Invoke($"发送失败: {ex.Message}");
+        }
+    }
+
+    public void DisconnectClient(string clientId)
+    {
+        RemoveClient(clientId);
+    }
+
+    public void Disconnect()
+    {
+        _cts?.Cancel();
+        _tcpClient?.Close();
+        _tcpListener?.Stop();
+        _udpClient?.Close();
+
+        foreach (var (_, client) in _tcpClients)
+            client.Close();
+        _tcpClients.Clear();
+        _clientInfos.Clear();
+        _lastUdpRemoteEndPoint = null;
+
+        _tcpClient = null;
+        _tcpListener = null;
+        _udpClient = null;
+        _cts = null;
+
+        IsConnected = false;
+        IsListening = false;
+        ConnectionChanged?.Invoke(false);
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        Disconnect();
+        _cts?.Dispose();
+    }
+}

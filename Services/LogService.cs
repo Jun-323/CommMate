@@ -1,0 +1,272 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Text;
+using CommMate.Models;
+
+namespace CommMate.Services;
+
+public class LogService : INotifyPropertyChanged
+{
+    private readonly List<LogEntry> _entries = new();
+    private readonly StringBuilder _logTextBuilder = new();
+    public ObservableCollection<string> DisplayLines { get; } = new();
+    public bool ShowTimestamp { get; set; } = true;
+    public bool IsHex { get; set; }
+
+    public event Action<string>? OnNewLine;
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private string _logText = "";
+    public string LogText
+    {
+        get => _logText;
+        private set
+        {
+            if (_logText != value)
+            {
+                _logText = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LogText)));
+            }
+        }
+    }
+
+    private readonly object _lock = new();
+
+    public void AddEntry(DataDirection direction, byte[] data, string channel = "")
+    {
+        var hex = Convert.ToHexString(data);
+        var ascii = BytesToAscii(data);
+        var entry = new LogEntry
+        {
+            Timestamp = DateTime.Now,
+            Direction = direction,
+            Data = hex,
+            Channel = channel
+        };
+
+        string display;
+        string appended;
+        lock (_lock)
+        {
+            _entries.Add(entry);
+            var atLineStart = _logTextBuilder.Length == 0 ||
+                _logTextBuilder[^1] == '\n';
+            var prepend = "";
+            // 不在行首时强制换行，确保每条数据都有独立时间戳
+            if (!atLineStart && _logTextBuilder.Length > 0)
+            {
+                prepend = Environment.NewLine;
+                _logTextBuilder.Append(prepend);
+                atLineStart = true;
+            }
+            display = BuildDisplayLine(entry, ascii, hex, atLineStart);
+            DisplayLines.Add(display);
+            _logTextBuilder.Append(display);
+            appended = prepend + display;
+        }
+        OnNewLine?.Invoke(appended);
+    }
+
+    private string FormatHex(string hex)
+    {
+        // Insert space between each byte: "41540D0A" -> "41 54 0D 0A"
+        var sb = new StringBuilder();
+        for (int i = 0; i < hex.Length; i += 2)
+        {
+            if (sb.Length > 0) sb.Append(' ');
+            sb.Append(hex[i]);
+            sb.Append(hex[i + 1]);
+        }
+        return sb.ToString();
+    }
+
+    private string BuildDisplayLine(LogEntry entry, string ascii, string hex, bool atLineStart)
+    {
+        var dirLabel = entry.Direction == DataDirection.Sent ? "TX" :
+            entry.Direction == DataDirection.Received ? "RX" : "SYS";
+        var ts = ShowTimestamp && atLineStart ? $"[{entry.FormattedTimestamp}] [{dirLabel}] " : "";
+
+        if (!IsHex)
+        {
+            // 按换行符拆分，每条独立加时间戳
+            var lines = SplitByNewlines(ascii);
+            var sb = new StringBuilder();
+            foreach (var line in lines)
+            {
+                if (sb.Length > 0) sb.Append("\r\n");
+                sb.Append(ts).Append(line);
+                ts = ""; // 仅首行带时间戳
+            }
+            return sb.ToString();
+        }
+
+        // HEX 模式：按 \r\n 切分，插入真正的换行符
+        var bytes = Convert.FromHexString(hex);
+        var result = new StringBuilder();
+        var chunk = new StringBuilder();
+        bool endedWithCrlf = false;
+        int i = 0;
+
+        while (i < bytes.Length)
+        {
+            if (bytes[i] == 0x0D && i + 1 < bytes.Length && bytes[i + 1] == 0x0A)
+            {
+                // CRLF：当前 chunk 结束，插入真正的换行
+                if (chunk.Length > 0)
+                {
+                    if (result.Length > 0) result.Append("\r\n");
+                    result.Append(ts).Append(chunk);
+                    ts = ""; // 续行不再打 timestamp
+                }
+                else if (result.Length > 0)
+                {
+                    // 空 chunk（连续换行），直接续行
+                    result.Append("\r\n");
+                }
+                chunk.Clear();
+                endedWithCrlf = true;
+                i += 2;
+            }
+            else
+            {
+                if (chunk.Length > 0) chunk.Append(' ');
+                chunk.Append(bytes[i].ToString("X2"));
+                endedWithCrlf = false;
+                i++;
+            }
+        }
+
+        // 剩余未结束的 chunk（数据不以 \r\n 结尾）
+        if (chunk.Length > 0)
+        {
+            if (result.Length > 0) result.Append("\r\n");
+            result.Append(ts).Append(chunk);
+            endedWithCrlf = false;
+        }
+
+        // 数据以 \r\n 结尾，补一个换行让下一条从新行开始
+        if (endedWithCrlf)
+            result.Append("\r\n");
+
+        return result.ToString();
+    }
+
+    public void AddSystemMessage(string message)
+    {
+        var entry = new LogEntry
+        {
+            Direction = DataDirection.System,
+            Data = message
+        };
+
+        var display = ShowTimestamp
+            ? $"[{entry.FormattedTimestamp}] [SYS] {message}"
+            : message;
+        string appended;
+        lock (_lock)
+        {
+            _entries.Add(entry);
+            DisplayLines.Add(display);
+            _logTextBuilder.AppendLine(display);
+            appended = display + Environment.NewLine;
+        }
+        OnNewLine?.Invoke(appended);
+    }
+
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            _entries.Clear();
+            DisplayLines.Clear();
+            _logTextBuilder.Clear();
+            LogText = "";
+        }
+    }
+
+    /// <summary>
+    /// 从 _logTextBuilder 重建 LogText 属性（O(n) 一次性操作，不在热路径上）
+    /// </summary>
+    private void UpdateLogText()
+    {
+        lock (_lock)
+        {
+            LogText = _logTextBuilder.ToString();
+        }
+    }
+
+    public void RebuildDisplayLines()
+    {
+        lock (_lock)
+        {
+            RebuildDisplayLinesLocked();
+            LogText = _logTextBuilder.ToString();
+        }
+    }
+
+    /// <summary>重建显示（调用方必须持有 _lock）。</summary>
+    private void RebuildDisplayLinesLocked()
+    {
+        DisplayLines.Clear();
+        _logTextBuilder.Clear();
+        foreach (var entry in _entries)
+        {
+            var data = Convert.FromHexString(entry.Data);
+            var ascii = BytesToAscii(data);
+            var atLineStart = _logTextBuilder.Length == 0 ||
+                _logTextBuilder[^1] == '\n';
+            // 不在行首时强制换行，确保每条数据都有独立时间戳
+            if (!atLineStart && _logTextBuilder.Length > 0)
+            {
+                _logTextBuilder.Append(Environment.NewLine);
+                atLineStart = true;
+            }
+            var display = BuildDisplayLine(entry, ascii, entry.Data, atLineStart);
+            DisplayLines.Add(display);
+            _logTextBuilder.Append(display);
+        }
+    }
+
+    public void SaveToFile(string filePath)
+    {
+        string content;
+        lock (_lock)
+        {
+            content = string.Join(Environment.NewLine, _entries.Select(e => e.ToString()));
+        }
+        File.WriteAllText(filePath, content);
+    }
+
+    public long TotalSentBytes
+    {
+        get
+        {
+            lock (_lock)
+                return _entries.Where(e => e.Direction == DataDirection.Sent).Sum(e => e.Data.Length / 2);
+        }
+    }
+
+    public long TotalRecvBytes
+    {
+        get
+        {
+            lock (_lock)
+                return _entries.Where(e => e.Direction == DataDirection.Received).Sum(e => e.Data.Length / 2);
+        }
+    }
+
+    private static string BytesToAscii(byte[] data)
+    {
+        var chars = data
+            .Where(b => (b >= 32 && b < 127) || b == 10 || b == 13)
+            .Select(b => (char)b);
+        return new string(chars.ToArray());
+    }
+
+    /// <summary>按 \r\n、\n、\r 拆分字符串，独立分行显示。</summary>
+    private static string[] SplitByNewlines(string text)
+    {
+        return text.Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
+    }
+}

@@ -1,0 +1,463 @@
+﻿using System.Collections.ObjectModel;
+using System.IO.Ports;
+using System.Text;
+using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommMate.Models;
+using CommMate.Services;
+using Microsoft.Win32;
+
+namespace CommMate.ViewModels;
+
+public partial class SerialViewModel : ObservableObject
+{
+    private readonly SerialPortService _serial = new();
+    private readonly LogService _log = new();
+    private System.Timers.Timer? _timedSendTimer;
+    private long _totalSent;
+    private long _totalRecv;
+
+    public LogService Log => _log;
+
+    [ObservableProperty] private string _selectedPort = "";
+    [ObservableProperty] private int _selectedBaudRate = 115200;
+    [ObservableProperty] private int _selectedBaudIndex;
+    [ObservableProperty] private int _selectedDataBits = 8;
+    [ObservableProperty] private int _selectedDataBitsIndex = 3;
+    [ObservableProperty] private int _selectedStopBitsIndex;
+    [ObservableProperty] private int _selectedParityIndex;
+    [ObservableProperty] private int _selectedFlowControlIndex;
+    [ObservableProperty] private int _selectedNewLineIndex;
+    [ObservableProperty] private bool _isOpen;
+    [ObservableProperty] private bool _isHex;
+    [ObservableProperty] private bool _appendNewLine = false;
+    [ObservableProperty] private bool _showTimestamp = true;
+    [ObservableProperty] private bool _autoScroll = true;
+    [ObservableProperty] private bool _timedSendEnabled;
+    [ObservableProperty] private int _timedSendInterval = 1000;
+    [ObservableProperty] private string _sendText = "";
+    [ObservableProperty] private string _statusText = "";
+    [ObservableProperty] private string _txBytesText = "TX: 0";
+    [ObservableProperty] private string _rxBytesText = "RX: 0";
+
+    public ObservableCollection<string> PortNames { get; } = new();
+    public int[] BaudRates { get; } = { 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 56000, 57600, 115200, 128000, 256000, 460800, 921600 };
+    public int[] DataBitsOptions { get; } = { 5, 6, 7, 8 };
+    public string[] StopBitsOptions { get; } = { "1", "1.5", "2" };
+    public string[] ParityOptions { get; } = { "None", "Odd", "Even", "Mark", "Space" };
+    public string[] FlowControlOptions { get; } = { "None", "RTS/CTS", "XON/XOFF", "RTS/CTS + XON/XOFF" };
+    public string[] NewLineOptions { get; } = { "\\r\\n", "\\n", "\\r" };
+    public string[] FramingModeOptions { get; } = { "Timeout", "Streaming" };
+    [ObservableProperty] private int _selectedFramingModeIndex;
+    [ObservableProperty] private int _packetTimeout = 50; // ms
+
+    public ObservableCollection<QuickCommand> QuickCommands { get; } = new();
+
+    public SerialViewModel()
+    {
+        StatusText = I18nService.Instance.T("Status.Ready");
+        _serial.DataReceived += OnDataReceived;
+        _serial.ErrorOccurred += OnError;
+        _serial.ConnectionChanged += OnConnectionChanged;
+        _serial.PortsChanged += OnPortsChanged;
+        RefreshPorts();
+        _serial.StartPortMonitoring();
+        
+        // 尝试从配置文件加载快速命令
+        LoadQuickCommandsFromConfig();
+        
+        // 如果配置中没有快速命令，则加载默认命令
+        if (QuickCommands.Count == 0)
+        {
+            LoadDefaultCommands();
+        }
+    }
+
+    private void LoadQuickCommandsFromConfig()
+    {
+        try
+        {
+            var config = ConfigService.LoadConfig();
+            if (config.QuickCommands != null && config.QuickCommands.Count > 0)
+            {
+                QuickCommands.Clear();
+                foreach (var cmd in config.QuickCommands)
+                {
+                    QuickCommands.Add(cmd);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"加载快速命令配置失败: {ex.Message}");
+        }
+    }
+    
+    private void LoadDefaultCommands()
+    {
+        QuickCommands.Add(new QuickCommand("AT"));
+        QuickCommands.Add(new QuickCommand("AT+CSQ"));
+        QuickCommands.Add(new QuickCommand("AT+QENG=\"servingcell\""));
+        QuickCommands.Add(new QuickCommand("AT+CGMI"));
+        QuickCommands.Add(new QuickCommand("AT+CGMM"));
+        QuickCommands.Add(new QuickCommand("AT+CGSN"));
+        QuickCommands.Add(new QuickCommand("AT+CREG?"));
+        QuickCommands.Add(new QuickCommand("AT+COPS?"));
+        QuickCommands.Add(new QuickCommand("AT+QNWINFO"));
+        QuickCommands.Add(new QuickCommand("AT+CPIN?"));
+        QuickCommands.Add(new QuickCommand("AT+CGATT?"));
+        QuickCommands.Add(new QuickCommand("AT+CGPADDR=1"));
+        QuickCommands.Add(new QuickCommand("AT+QIACT?"));
+        QuickCommands.Add(new QuickCommand("AT+QCFG=\"band\""));
+        QuickCommands.Add(new QuickCommand("AT+CFUN?"));
+    }
+
+    partial void OnShowTimestampChanged(bool oldValue, bool newValue)
+    {
+        _log.ShowTimestamp = newValue;
+    }
+
+    partial void OnIsHexChanged(bool oldValue, bool newValue)
+    {
+        _log.IsHex = newValue;
+    }
+
+    private void OnPortsChanged(string[] ports)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            PortNames.Clear();
+            foreach (var p in ports) PortNames.Add(p);
+        });
+    }
+
+    private void OnDataReceived(byte[] data)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            _log.AddEntry(DataDirection.Received, data, _serial.Config.PortName);
+            _totalRecv += data.Length;
+            RxBytesText = $"RX: {_totalRecv}";
+        });
+    }
+
+    private void OnError(string msg)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            _log.AddSystemMessage(msg);
+        });
+    }
+
+    private void OnConnectionChanged(bool connected)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            IsOpen = connected;
+            StatusText = connected
+                ? I18nService.Instance.T("Status.Connected") + $" ({SelectedPort} @ {SelectedBaudRate})"
+                : I18nService.Instance.T("Status.Disconnected");
+        });
+    }
+
+    [RelayCommand]
+    public void RefreshPorts()
+    {
+        PortNames.Clear();
+        foreach (var port in _serial.GetAvailablePorts())
+            PortNames.Add(port);
+        
+        // 自动选择串口：优先选择名称包含 "AT" 的端口，否则选择第一个
+        if (PortNames.Count > 0)
+        {
+            var atPort = PortNames.FirstOrDefault(p => p.Contains("AT", StringComparison.OrdinalIgnoreCase));
+            SelectedPort = atPort ?? PortNames[0];
+        }
+        else
+        {
+            SelectedPort = "";
+        }
+    }
+
+    [RelayCommand]
+    public async Task OpenClose()
+    {
+        if (IsOpen)
+        {
+            _timedSendTimer?.Stop();
+            await _serial.CloseAsync();
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(SelectedPort))
+            {
+                _log.AddSystemMessage("未选择串口");
+                return;
+            }
+
+            _serial.Config.PortName = SelectedPort;
+            _serial.Config.BaudRate = SelectedBaudRate;
+            _serial.Config.DataBits = SelectedDataBits;
+            _serial.Config.StopBits = SelectedStopBitsIndex switch { 0 => StopBits.One, 1 => StopBits.OnePointFive, _ => StopBits.Two };
+            _serial.Config.Parity = (Parity)SelectedParityIndex;
+            _serial.Config.FlowControl = SelectedFlowControlIndex switch
+            {
+                1 => Handshake.RequestToSend,
+                2 => Handshake.XOnXOff,
+                3 => Handshake.RequestToSendXOnXOff,
+                _ => Handshake.None
+            };
+            _serial.Config.NewLine = SelectedNewLineIndex switch { 1 => "\n", 2 => "\r", _ => "\r\n" };
+            _serial.Config.FramingMode = SelectedFramingModeIndex == 1 ? FramingMode.Streaming : FramingMode.Timeout;
+            _serial.Config.PacketTimeout = Math.Max(1, PacketTimeout);
+
+            _totalSent = 0;
+            _totalRecv = 0;
+            TxBytesText = "TX: 0";
+            RxBytesText = "RX: 0";
+
+            _serial.Open();
+        }
+    }
+
+    [RelayCommand]
+    public void Send()
+    {
+        if (!IsOpen || string.IsNullOrEmpty(SendText)) return;
+
+        byte[] data;
+        if (IsHex)
+        {
+            try
+            {
+                data = HexHelper.HexStringToBytes(SendText);
+            }
+            catch
+            {
+                _log.AddSystemMessage("Hex 格式无效");
+                return;
+            }
+        }
+        else
+        {
+            var text = SendText;
+            if (AppendNewLine)
+            {
+                switch (SelectedNewLineIndex)
+                {
+                    case 1: text += "\n"; break;
+                    case 2: text += "\r"; break;
+                    default: text += "\r\n"; break;
+                }
+            }
+            data = Encoding.UTF8.GetBytes(text);
+        }
+
+        if (_serial.Send(data))
+        {
+            _log.AddEntry(DataDirection.Sent, data, _serial.Config.PortName);
+            _totalSent += data.Length;
+            TxBytesText = $"TX: {_totalSent}";
+        }
+    }
+
+    partial void OnTimedSendEnabledChanged(bool value)
+    {
+        if (value)
+        {
+            _timedSendTimer = new System.Timers.Timer(TimedSendInterval);
+            _timedSendTimer.Elapsed += (_, _) => Application.Current.Dispatcher.Invoke(() => SendCommand.Execute(null));
+            _timedSendTimer.Start();
+        }
+        else
+        {
+            _timedSendTimer?.Stop();
+            _timedSendTimer?.Dispose();
+            _timedSendTimer = null;
+        }
+    }
+
+    partial void OnTimedSendIntervalChanged(int value)
+    {
+        if (_timedSendTimer != null)
+            _timedSendTimer.Interval = value;
+    }
+
+    [RelayCommand]
+    public void AddQuickCommand()
+    {
+        QuickCommands.Add(new QuickCommand());
+    }
+
+    [RelayCommand]
+    public void EditQuickCommand(QuickCommand? cmd)
+    {
+        if (cmd == null) return;
+
+        // Use current send text as the new command content
+        cmd.CommandText = SendText;
+        cmd.IsHex = IsHex;
+    }
+
+    [RelayCommand]
+    public void DeleteQuickCommand(QuickCommand? cmd)
+    {
+        if (cmd != null)
+            QuickCommands.Remove(cmd);
+    }
+
+    [RelayCommand]
+    public void SendQuickCommand(QuickCommand? cmd)
+    {
+        if (!IsOpen || cmd == null) return;
+
+        byte[] data;
+        if (cmd.IsHex)
+        {
+            try
+            {
+                data = HexHelper.HexStringToBytes(cmd.CommandText);
+            }
+            catch
+            {
+                var name = cmd.CommandText.Length > 30 ? cmd.CommandText[..30] + "..." : cmd.CommandText;
+                _log.AddSystemMessage($"指令 [{name}] Hex 格式无效");
+                return;
+            }
+        }
+        else
+        {
+            var text = cmd.CommandText;
+            if (AppendNewLine)
+            {
+                switch (SelectedNewLineIndex)
+                {
+                    case 1: text += "\n"; break;
+                    case 2: text += "\r"; break;
+                    default: text += "\r\n"; break;
+                }
+            }
+            data = Encoding.UTF8.GetBytes(text);
+        }
+
+        if (_serial.Send(data))
+        {
+            _log.AddEntry(DataDirection.Sent, data, _serial.Config.PortName);
+            _totalSent += data.Length;
+            TxBytesText = $"TX: {_totalSent}";
+        }
+    }
+
+    [RelayCommand]
+    public void ClearData()
+    {
+        _log.Clear();
+    }
+
+    [RelayCommand]
+    public void SaveLog()
+    {
+        var dialog = new SaveFileDialog
+        {
+            Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*",
+            DefaultExt = "txt",
+            FileName = $"CommMate_Log_{DateTime.Now:yyyyMMdd_HHmmss}.txt"
+        };
+        if (dialog.ShowDialog() == true)
+        {
+            _log.SaveToFile(dialog.FileName);
+            _log.AddSystemMessage($"日志已保存: {dialog.FileName}");
+        }
+    }
+    
+    public void SaveQuickCommandsToConfig()
+    {
+        try
+        {
+            var config = ConfigService.LoadConfig();
+            config.QuickCommands.Clear();
+            foreach (var cmd in QuickCommands)
+            {
+                config.QuickCommands.Add(cmd.Clone());
+            }
+            ConfigService.SaveConfig(config);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"保存快速命令配置失败: {ex.Message}");
+        }
+    }
+
+    public void ApplyConfig(AppConfig config)
+    {
+        if (config == null) return;
+
+        var portIndex = PortNames.IndexOf(config.SerialPortName);
+        if (portIndex >= 0) SelectedPort = PortNames[portIndex];
+
+        var baudIndex = Array.IndexOf(BaudRates, config.SerialBaudRate);
+        if (baudIndex >= 0) SelectedBaudIndex = baudIndex;
+
+        SelectedDataBitsIndex = Array.IndexOf(DataBitsOptions, config.SerialDataBits);
+        if (SelectedDataBitsIndex < 0) SelectedDataBitsIndex = 3;
+
+        SelectedStopBitsIndex = config.SerialStopBits switch
+        {
+            StopBits.One => 0,
+            StopBits.OnePointFive => 1,
+            StopBits.Two => 2,
+            _ => 0
+        };
+
+        SelectedParityIndex = config.SerialParity switch
+        {
+            Parity.None => 0,
+            Parity.Odd => 1,
+            Parity.Even => 2,
+            Parity.Mark => 3,
+            Parity.Space => 4,
+            _ => 0
+        };
+
+        SelectedFlowControlIndex = config.SerialFlowControl switch
+        {
+            Handshake.None => 0,
+            Handshake.RequestToSend => 1,
+            Handshake.XOnXOff => 2,
+            Handshake.RequestToSendXOnXOff => 3,
+            _ => 0
+        };
+
+        SelectedFramingModeIndex = config.SerialFramingMode == FramingMode.Streaming ? 1 : 0;
+        PacketTimeout = config.SerialPacketTimeout;
+        IsHex = config.SerialIsHex;
+        ShowTimestamp = config.SerialShowTimestamp;
+        AutoScroll = config.SerialAutoScroll;
+        AppendNewLine = config.SerialAppendNewLine;
+        SelectedNewLineIndex = config.SerialSelectedNewLineIndex;
+    }
+
+    public void UpdateConfig(AppConfig config)
+    {
+        if (config == null) return;
+
+        config.SerialPortName = SelectedPort;
+        config.SerialBaudRate = SelectedBaudRate;
+        config.SerialParity = _serial.Config.Parity;
+        config.SerialDataBits = _serial.Config.DataBits;
+        config.SerialStopBits = _serial.Config.StopBits;
+        config.SerialFlowControl = _serial.Config.FlowControl;
+        config.SerialFramingMode = _serial.Config.FramingMode;
+        config.SerialPacketTimeout = _serial.Config.PacketTimeout;
+        config.SerialIsHex = IsHex;
+        config.SerialShowTimestamp = ShowTimestamp;
+        config.SerialAutoScroll = AutoScroll;
+        config.SerialAppendNewLine = AppendNewLine;
+        config.SerialSelectedNewLineIndex = SelectedNewLineIndex;
+
+        config.QuickCommands.Clear();
+        foreach (var cmd in QuickCommands)
+            config.QuickCommands.Add(cmd.Clone());
+    }
+}

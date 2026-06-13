@@ -1,0 +1,710 @@
+<Window x:Class="CommMate.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:CommMate.ViewModels"
+        xmlns:conv="clr-namespace:CommMate.Converters"
+        Title="CommMate - Serial &amp; Network Debug Tool"
+        Width="960" Height="640" MinWidth="800" MinHeight="500">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="PanelBgBrush" Color="#FAFAFA"/>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#F5F5F5"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#D0D0D0"/>
+        <SolidColorBrush x:Key="ControlBgBrush" Color="White"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#666666"/>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{DynamicResource ControlBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press" Focusable="False">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="2">
+                                            <Path Data="M0,0 L4,4 L8,0 Z" Fill="{TemplateBinding Foreground}"
+                                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                  Margin="0,0,6,0" Width="8" Height="4" Stretch="Uniform"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="ContentSite"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="8,3,23,3" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                              IsHitTestVisible="False"/>
+                            <Popup x:Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True" Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Border x:Name="DropDown"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="1" CornerRadius="2"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                        MinWidth="{TemplateBinding ActualWidth}">
+                                    <ScrollViewer SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="{DynamicResource ControlBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                Padding="6,4" SnapsToDevicePixels="True">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        </Style>
+        <Style TargetType="Menu">
+            <Setter Property="Background" Value="{DynamicResource PanelBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        </Style>
+        <Style TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource PanelBgBrush}"/>
+            <Setter Property="Padding" Value="12,4"/>
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        </Style>
+        <Style TargetType="ScrollViewer">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:InverseBoolConverter x:Key="InverseBool"/>
+
+        <!-- Compact Hex ToggleButton for Quick Commands -->
+        <Style x:Key="HexToggleStyle" TargetType="ToggleButton">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="5,1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="bd" Background="Transparent" CornerRadius="2"
+                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Menu -->
+        <Menu Grid.Row="0" FontSize="14">
+            <MenuItem Header="File" x:Name="MenuFile">
+                <MenuItem Header="Exit" Click="Exit_Click"/>
+            </MenuItem>
+            <MenuItem Header="View" x:Name="MenuView">
+                <MenuItem Header="Language" x:Name="MenuLanguage">
+                    <MenuItem x:Name="MenuLangZh" Header="中文" Click="LangZh_Click"/>
+                    <MenuItem x:Name="MenuLangEn" Header="English" Click="LangEn_Click"/>
+                </MenuItem>
+                <MenuItem Header="Theme" x:Name="MenuTheme">
+                    <MenuItem Header="Light" Click="ThemeLight_Click"/>
+                    <MenuItem Header="Dark" Click="ThemeDark_Click"/>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Help" x:Name="MenuHelp">
+                <MenuItem Header="About" Click="About_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Tab headers -->
+        <Border Grid.Row="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Background="{DynamicResource SurfaceBrush}">
+            <StackPanel Orientation="Horizontal" Margin="4,2">
+                <RadioButton x:Name="TabSerial" Content="Serial" GroupName="Tabs"
+                             IsChecked="True" Style="{StaticResource TabButtonStyle}"
+                             Margin="2,0" Padding="16,6"/>
+                <RadioButton x:Name="TabNetwork" Content="Network" GroupName="Tabs"
+                             Style="{StaticResource TabButtonStyle}"
+                             Margin="2,0" Padding="16,6"/>
+                <RadioButton x:Name="TabTerminal" Content="Terminal" GroupName="Tabs"
+                             Style="{StaticResource TabButtonStyle}"
+                             Margin="2,0" Padding="16,6"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Tab Content Area -->
+        <Grid Grid.Row="2">
+            <!-- Serial Panel -->
+            <Grid x:Name="SerialPanel" Visibility="Visible">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="280" MinWidth="180" MaxWidth="500"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Serial Config -->
+                <Border Grid.Column="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0"
+                        Background="{DynamicResource PanelBgBrush}" Padding="8">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="10" Height="10" Margin="0,6,6,0">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Fill" Value="{DynamicResource GrayBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Serial.IsOpen}" Value="True">
+                                                    <Setter Property="Fill" Value="{DynamicResource SuccessBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
+                                <TextBlock Text="Serial Port" FontWeight="Bold" Margin="0,4,0,8"/>
+                            </StackPanel>
+                            
+                            <TextBlock Text="Port:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Serial.PortNames}"
+                                      SelectedItem="{Binding Serial.SelectedPort}"
+                                      Height="28" Margin="0,0,0,6"/>
+
+                            <TextBlock Text="Baud Rate:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Serial.BaudRates}"
+                                      SelectedItem="{Binding Serial.SelectedBaudRate}"
+                                      Height="28" Margin="0,0,0,6"/>
+
+                            <TextBlock Text="Data Bits:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Serial.DataBitsOptions}"
+                                      SelectedIndex="{Binding Serial.SelectedDataBitsIndex}"
+                                      Height="28" Margin="0,0,0,6"/>
+
+                            <TextBlock Text="Stop Bits:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Serial.StopBitsOptions}"
+                                      SelectedIndex="{Binding Serial.SelectedStopBitsIndex}"
+                                      Height="28" Margin="0,0,0,6"/>
+
+                            <TextBlock Text="Parity:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Serial.ParityOptions}"
+                                      SelectedIndex="{Binding Serial.SelectedParityIndex}"
+                                      Height="28" Margin="0,0,0,6"/>
+
+                            <TextBlock Text="Flow Control:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Serial.FlowControlOptions}"
+                                      SelectedIndex="{Binding Serial.SelectedFlowControlIndex}"
+                                      Height="28" Margin="0,0,0,6"/>
+
+                            <TextBlock Text="New Line:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Serial.NewLineOptions}"
+                                      SelectedIndex="{Binding Serial.SelectedNewLineIndex}"
+                                      Height="28" Margin="0,0,0,6"/>
+                            <CheckBox Content="Append NL" IsChecked="{Binding Serial.AppendNewLine}"
+                                      Margin="0,0,0,6" FontSize="14"/>
+
+                            <TextBlock Text="Framing:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Serial.FramingModeOptions}"
+                                      SelectedIndex="{Binding Serial.SelectedFramingModeIndex}"
+                                      Height="28" Margin="0,0,0,6"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="Timeout (ms):" FontSize="13" VerticalAlignment="Center"/>
+                                <TextBox Text="{Binding Serial.PacketTimeout}" Width="60"
+                                         Margin="4,0,0,0" Height="26" FontSize="12"
+                                         VerticalContentAlignment="Center"/>
+                            </StackPanel>
+
+                            <Button Command="{Binding Serial.OpenCloseCommand}"
+                                    Height="32" Margin="0,10,0,4" FontWeight="Bold">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                        <Setter Property="Content" Value="Open"/>
+                                        <Setter Property="Background" Value="{DynamicResource SuccessBrush}"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Serial.IsOpen}" Value="True">
+                                                <Setter Property="Content" Value="Close"/>
+                                                <Setter Property="Background" Value="{DynamicResource DangerBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+
+                            <TextBlock Text="Timed Send:" Margin="0,12,0,2" FontSize="14"/>
+                            <CheckBox Content="Enable" IsChecked="{Binding Serial.TimedSendEnabled}"
+                                      Margin="0,2,0,4"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="Interval (ms):" FontSize="13" VerticalAlignment="Center"/>
+                                <TextBox Text="{Binding Serial.TimedSendInterval}" Width="70"
+                                         Margin="4,0,0,0" Height="26" FontSize="12"
+                                         VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Serial Data -->
+                <Grid Grid.Column="1" Margin="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" MinHeight="60"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*" MinHeight="60"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Receive Area -->
+                    <Border Grid.Row="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,0,4">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="4">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Content="Hex" IsChecked="{Binding Serial.IsHex}" Margin="0,0,8,0"
+                                              FontSize="14"/>
+                                    <CheckBox Content="Timestamp" IsChecked="{Binding Serial.ShowTimestamp}"
+                                              Margin="0,0,8,0" FontSize="14"/>
+                                    <CheckBox Content="Auto Scroll" IsChecked="{Binding Serial.AutoScroll}"
+                                              Margin="0,0,8,0" FontSize="14"/>
+                                    <Button Content="Clear" Command="{Binding Serial.ClearDataCommand}"
+                                            Height="26" FontSize="12" Padding="8,2"/>
+                                    <Button Content="Save Log" Command="{Binding Serial.SaveLogCommand}"
+                                            Height="26" FontSize="12" Padding="8,2" Margin="4,0,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <TextBox Grid.Row="1"
+                                     FontFamily="Consolas" FontSize="14"
+                                     Background="{DynamicResource ControlBgBrush}" BorderThickness="0"
+                                     VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     IsReadOnly="True"
+                                     TextWrapping="NoWrap"
+                                     UndoLimit="0"
+                                     x:Name="SerialRecvBox"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Splitter between receive and send -->
+                    <GridSplitter Grid.Row="1" Height="4" HorizontalAlignment="Stretch"
+                                  Background="Transparent" ShowsPreview="True"/>
+
+                    <!-- Send Area -->
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBox x:Name="SerialSendBox" Grid.Row="0"
+                                 Text="{Binding Serial.SendText, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" FontFamily="Consolas" FontSize="14"
+                                 TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                 PreviewKeyDown="SendBox_PreviewKeyDown"
+                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,0,4"/>
+                        <Grid Grid.Row="1" Margin="0,2,0,0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Serial.TxBytesText}" FontSize="14"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding Serial.RxBytesText}" FontSize="14"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="12,0,0,0"/>
+                            </StackPanel>
+                            <Button Content="Send" Command="{Binding Serial.SendCommand}"
+                                    Width="80" Height="28" HorizontalAlignment="Right"
+                                    Background="{DynamicResource AccentBrush}" Foreground="White" FontWeight="Bold"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <!-- Grid Splitter between data area and Quick Commands -->
+                <GridSplitter Grid.Column="2" Width="4"
+                              Background="Transparent"
+                              VerticalAlignment="Stretch" HorizontalAlignment="Center"
+                              ShowsPreview="True"/>
+
+                <!-- Quick Commands Panel (right) -->
+                <Border Grid.Column="3" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0"
+                        Background="{DynamicResource PanelBgBrush}">
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="Quick Commands" FontWeight="Bold" VerticalAlignment="Center" FontSize="14"/>
+                            <Button Content="+" Command="{Binding Serial.AddQuickCommandCommand}"
+                                    Width="22" Height="22" FontSize="14" FontWeight="Bold"
+                                    Margin="8,0,0,0" Padding="0" Background="{DynamicResource SuccessBrush}" Foreground="White"
+                                    ToolTip="Add current send text as command"/>
+                        </StackPanel>
+
+                        <!-- Editable command list -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Serial.QuickCommands}"
+                                          x:Name="QuickCmdItems">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="2,3">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <ToggleButton Grid.Column="0" IsChecked="{Binding IsHex}"
+                                                              Content="Hex" Style="{StaticResource HexToggleStyle}"
+                                                              Margin="0,0,4,0" VerticalAlignment="Center"
+                                                              ToolTip="Send as hex bytes"/>
+                                                <!-- Single editable command input -->
+                                                <TextBox Grid.Column="1"
+                                                         Text="{Binding CommandText, UpdateSourceTrigger=PropertyChanged}"
+                                                         FontFamily="Consolas" FontSize="13" Height="28"
+                                                         Padding="4,2" BorderBrush="{DynamicResource BorderBrush}" Background="{DynamicResource ControlBgBrush}"
+                                                         ToolTip="Editable AT command"/>
+                                                <Button Grid.Column="2" Content="▶" Width="30" Height="28"
+                                                        FontSize="14" Padding="0" Margin="2,0,0,0"
+                                                        Background="{DynamicResource AccentBrush}" Foreground="White"
+                                                        Command="{Binding DataContext.Serial.SendQuickCommandCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip="Send this command"/>
+                                                <Button Grid.Column="3" Content="✕" Width="26" Height="28"
+                                                        FontSize="14" Padding="0" Margin="2,0,0,0"
+                                                        Foreground="{DynamicResource DangerBrush}" Background="Transparent"
+                                                        BorderThickness="0"
+                                                        Command="{Binding DataContext.Serial.DeleteQuickCommandCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip="Delete this command"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Network Panel -->
+            <Grid x:Name="NetworkPanel" Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0"
+                        Background="{DynamicResource PanelBgBrush}" Padding="8">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="10" Height="10" Margin="0,6,6,0">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Fill" Value="{DynamicResource GrayBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Network.IsConnected}" Value="True">
+                                                    <Setter Property="Fill" Value="{DynamicResource SuccessBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
+                                <TextBlock Text="Network" FontWeight="Bold" Margin="0,4,0,8"/>
+                            </StackPanel>
+
+                            <TextBlock Text="Mode:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Network.ModeOptions}"
+                                      SelectedIndex="{Binding Network.SelectedModeIndex}"
+                                      Height="28" Margin="0,0,0,6"/>
+
+                            <TextBlock Text="Local IP:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Network.LocalIPs}"
+                                      SelectedIndex="{Binding Network.SelectedLocalIPIndex}"
+                                      Height="28" Margin="0,0,0,6"/>
+
+                            <TextBlock Text="Local Port:" Margin="0,4,0,2" FontSize="14"/>
+                            <TextBox Text="{Binding Network.LocalPort}" Height="28" Margin="0,0,0,6"
+                                     FontSize="12" VerticalContentAlignment="Center"/>
+
+                            <TextBlock Text="Remote Host:" Margin="0,4,0,2" FontSize="14"/>
+                            <TextBox Text="{Binding Network.RemoteHost}" Height="28" Margin="0,0,0,6"
+                                     FontSize="12" VerticalContentAlignment="Center"/>
+
+                            <TextBlock Text="Remote Port:" Margin="0,4,0,2" FontSize="14"/>
+                            <TextBox Text="{Binding Network.RemotePort}" Height="28" Margin="0,0,0,6"
+                                     FontSize="12" VerticalContentAlignment="Center"/>
+
+                            <CheckBox Content="Broadcast (UDP)" IsChecked="{Binding Network.EnableBroadcast}"
+                                      Margin="0,4,0,4" FontSize="14"/>
+
+                            <TextBlock Text="New Line:" Margin="0,4,0,2" FontSize="14"/>
+                            <ComboBox ItemsSource="{Binding Network.NewLineOptions}"
+                                      SelectedIndex="{Binding Network.SelectedNewLineIndex}"
+                                      Height="28" Margin="0,0,0,6"/>
+                            <CheckBox Content="Append NL" IsChecked="{Binding Network.AppendNewLine}"
+                                      Margin="0,0,0,6" FontSize="14"/>
+
+                            <Button Content="{Binding Network.ButtonText}"
+                                    Command="{Binding Network.ConnectDisconnectCommand}"
+                                    Height="32" Margin="0,10,0,4" FontWeight="Bold"
+                                    Background="{DynamicResource SuccessBrush}" Foreground="White"/>
+
+                            <!-- TCP Server: connected clients -->
+                            <TextBlock Text="Connected Clients:" FontWeight="Bold" Margin="0,12,0,4" FontSize="14"
+                                       Visibility="{Binding Network.IsConnected, Converter={StaticResource BoolToVis}}"/>
+                            <ListBox ItemsSource="{Binding Network.ConnectedClients}"
+                                     Height="Auto" MaxHeight="160" Margin="0,0,0,6"
+                                     Visibility="{Binding Network.IsConnected, Converter={StaticResource BoolToVis}}"
+                                     FontSize="14">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,1" Background="Transparent">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding RemoteEndPoint}" FontSize="14"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                <TextBlock Text="{Binding ConnectedTime, StringFormat='{}{0:HH:mm:ss}'}"
+                                                           FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Content="✕" Width="20" Height="20"
+                                                    FontSize="14" Padding="0" Margin="4,0,0,0"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                                    Command="{Binding DataContext.Network.DisconnectClientCommand,
+                                                              RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                    CommandParameter="{Binding Id}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <TextBlock Text="{Binding Network.ClientCountText}"
+                                       FontSize="14" Margin="0,6,0,0" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+
+                <Grid Grid.Column="1" Margin="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" MinHeight="60"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*" MinHeight="60"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,0,4">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="4">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Content="Hex" IsChecked="{Binding Network.IsHex}" FontSize="14" Margin="0,0,8,0"/>
+                                    <CheckBox Content="Timestamp" IsChecked="{Binding Network.ShowTimestamp}" FontSize="14" Margin="0,0,8,0"/>
+                                    <Button Content="Clear" Command="{Binding Network.ClearDataCommand}" Height="26" FontSize="12" Padding="8,2"/>
+                                    <Button Content="Save Log" Command="{Binding Network.SaveLogCommand}" Height="26" FontSize="12" Padding="8,2" Margin="4,0,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <TextBox Grid.Row="1"
+                                     FontFamily="Consolas" FontSize="14"
+                                     Background="{DynamicResource ControlBgBrush}" BorderThickness="0"
+                                     VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     IsReadOnly="True"
+                                     TextWrapping="NoWrap"
+                                     UndoLimit="0"
+                                     x:Name="NetworkRecvBox"/>
+                        </Grid>
+                    </Border>
+
+                    <GridSplitter Grid.Row="1" Height="4" HorizontalAlignment="Stretch"
+                                  Background="Transparent" ShowsPreview="True"/>
+
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBox x:Name="NetworkSendBox" Grid.Row="0"
+                                 Text="{Binding Network.SendText, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" FontFamily="Consolas" FontSize="14"
+                                 TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                 PreviewKeyDown="SendBox_PreviewKeyDown"
+                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,0,4"/>
+                        <Grid Grid.Row="1" Margin="0,2,0,0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Network.TxBytesText}" FontSize="14"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding Network.RxBytesText}" FontSize="14"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="12,0,0,0"/>
+                            </StackPanel>
+                            <Button Content="Send" Command="{Binding Network.SendCommand}"
+                                    Width="80" Height="28" HorizontalAlignment="Right"
+                                    Background="{DynamicResource AccentBrush}" Foreground="White" FontWeight="Bold"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!-- Terminal Panel -->
+            <Grid x:Name="TerminalPanel" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <RichTextBox Grid.Row="0" x:Name="TerminalDisplay"
+                             FontFamily="Consolas" FontSize="14"
+                             Background="{StaticResource TerminalBgBrush}" Foreground="{StaticResource TerminalTextBrush}"
+                             BorderThickness="0" IsReadOnly="True"
+                             VerticalScrollBarVisibility="Auto"
+                             PreviewKeyDown="TerminalDisplay_PreviewKeyDown"
+                             PreviewTextInput="TerminalDisplay_PreviewTextInput"/>
+
+                <Border Grid.Row="1" Background="{StaticResource TerminalSurfaceBrush}" Padding="6"
+                        BorderBrush="{StaticResource TerminalBorderBrush}" BorderThickness="0,1,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                            <TextBlock Text="Port:" Foreground="{StaticResource TerminalLabelBrush}" FontSize="14" VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding Terminal.PortNames}"
+                                      SelectedItem="{Binding Terminal.SelectedPort}"
+                                      Width="80" Height="28" Margin="4,0,8,0" FontSize="13"
+                                      Background="{StaticResource TerminalControlBrush}" Foreground="{StaticResource TerminalTextBrush}"/>
+                            <TextBlock Text="Baud:" Foreground="{StaticResource TerminalLabelBrush}" FontSize="14" VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding Terminal.BaudRates}"
+                                      SelectedItem="{Binding Terminal.SelectedBaudRate}"
+                                      Width="100" Height="28" Margin="4,0,8,0" FontSize="13"
+                                      Background="{StaticResource TerminalControlBrush}" Foreground="{StaticResource TerminalTextBrush}"/>
+                        </StackPanel>
+
+                        <Button Grid.Column="1" Width="80" Height="30"
+                                FontWeight="Bold"
+                                Command="{Binding Terminal.ConnectDisconnectCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                    <Setter Property="Content" Value="Connect"/>
+                                    <Setter Property="Background" Value="{StaticResource TerminalControlBrush}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource TerminalTextBrush}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Terminal.IsConnected}" Value="True">
+                                            <Setter Property="Content" Value="Disconnect"/>
+                                            <Setter Property="Background" Value="{StaticResource TerminalControlBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <CheckBox Content="Local Echo" IsChecked="{Binding Terminal.LocalEcho}"
+                                      Foreground="{StaticResource TerminalLabelBrush}" FontSize="14" VerticalAlignment="Center"
+                                      Margin="0,0,8,0"/>
+                            <Button Content="Clear" Command="{Binding Terminal.ClearScreenCommand}"
+                                    Width="50" Height="28" FontSize="13" Padding="8,3"
+                                    Background="{StaticResource TerminalBorderBrush}" Foreground="{StaticResource TerminalLabelBrush}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="3" Background="{DynamicResource PanelBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0"
+                Padding="8,3">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding StatusText}" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"
+                           x:Name="StatusText"/>
+                <TextBlock Text="" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="20,0,0,0"
+                           x:Name="DateTimeText"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
