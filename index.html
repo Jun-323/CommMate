@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CommMate - 串口 & 网络调试助手</title>
+  <meta name="description" content="CommMate 是一款轻量、高效的串口与网络调试工具，面向嵌入式开发者，基于 .NET 10 WPF 构建。">
+  <link rel="icon" type="image/png" href="icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    .gradient-bg {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    }
+    .glow {
+      box-shadow: 0 0 60px rgba(99, 102, 241, 0.15), 0 0 120px rgba(99, 102, 241, 0.05);
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    }
+    .feature-card { transition: all 0.3s ease; }
+    .hero-mockup {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    .pulse-dot {
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .float {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 font-sans antialiased">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-lg border-b border-gray-100 z-50">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2">
+        <img src="icon.png" alt="CommMate" class="w-8 h-8 rounded-lg">
+        <span class="font-bold text-lg">CommMate</span>
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm text-gray-600">
+        <a href="#features" class="hover:text-gray-900 transition">特性</a>
+        <a href="#download" class="hover:text-gray-900 transition">下载</a>
+        <a href="#changelog" class="hover:text-gray-900 transition">更新日志</a>
+        <a href="#discussions" class="hover:text-gray-900 transition">讨论</a>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/Jun-323/CommMate" target="_blank" rel="noopener" class="hidden sm:flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <!-- Mobile menu button -->
+        <button id="mobile-menu-btn" class="md:hidden flex items-center justify-center w-9 h-9 rounded-lg hover:bg-gray-100 transition" aria-label="打开菜单">
+          <svg id="menu-icon" class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg id="close-icon" class="w-5 h-5 text-gray-700 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-100">
+      <div class="px-6 py-4 space-y-1">
+        <a href="#features" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">特性</a>
+        <a href="#download" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">下载</a>
+        <a href="#changelog" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">更新日志</a>
+        <a href="#discussions" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">讨论</a>
+        <a href="https://github.com/Jun-323/CommMate" target="_blank" rel="noopener" class="flex items-center gap-2 py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="gradient-bg pt-32 pb-20 md:pt-40 md:pb-28 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-30">
+      <div class="absolute top-20 left-10 w-72 h-72 bg-brand-500 rounded-full filter blur-[120px]"></div>
+      <div class="absolute bottom-10 right-20 w-96 h-96 bg-purple-500 rounded-full filter blur-[150px]"></div>
+    </div>
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-1.5 text-sm text-brand-300 mb-8">
+          <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
+          v1.0 正式发布
+        </div>
+        <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+          串口 & 网络调试<br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400">就该这么简单</span>
+        </h1>
+        <p class="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed">
+          CommMate 是面向嵌入式开发者的轻量调试工具，串口收发、TCP/UDP 网络调试一站式搞定，告别繁琐切换。
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="https://raw.githubusercontent.com/Jun-323/CommMate/refs/heads/master/CommMate.exe" id="download-btn"
+             class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-3.5 rounded-xl text-base transition shadow-lg shadow-brand-600/30">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            免费下载 Windows 版
+          </a>
+          <a href="https://github.com/Jun-323/CommMate" target="_blank" rel="noopener"
+             class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-medium px-6 py-3.5 rounded-xl text-base transition border border-white/20">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            查看 GitHub
+          </a>
+        </div>
+        <p class="mt-4 text-sm text-gray-400" id="version-info">v1.0.0 · Windows 10+ · 需安装 .NET 10 Runtime</p>
+      </div>
+
+      <!-- Mockup -->
+      <div class="mt-16 max-w-4xl mx-auto float">
+        <div class="hero-mockup rounded-2xl overflow-hidden glow">
+          <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+            <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+            <span class="ml-3 text-xs text-gray-500 font-mono">CommMate v1.0.0</span>
+          </div>
+          <div class="p-6 md:p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Serial Panel -->
+              <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                <div class="flex items-center gap-2 mb-3">
+                  <div class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></div>
+                  <span class="text-xs text-green-400 font-medium">串口已连接</span>
+                  <span class="text-xs text-gray-500 ml-auto font-mono">COM3 · 115200</span>
+                </div>
+                <div class="space-y-1.5 font-mono text-xs">
+                  <div class="text-green-400">TX → AT+CGMI</div>
+                  <div class="text-blue-400">RX ← Quectel</div>
+                  <div class="text-green-400">TX → AT+CGMM</div>
+                  <div class="text-blue-400">RX ← EC200U</div>
+                  <div class="text-green-400">TX → AT+CCLK?</div>
+                  <div class="text-blue-400">RX ← +CCLK: "26/06/14,09:00:00+32"</div>
+                  <div class="text-green-400">TX → AT+QCFG="nwscanmode"</div>
+                  <div class="text-blue-400">RX ← +QCFG: "nwscanmode",2</div>
+                </div>
+              </div>
+              <!-- Network Panel -->
+              <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                <div class="flex items-center gap-2 mb-3">
+                  <div class="w-2 h-2 bg-blue-400 rounded-full pulse-dot"></div>
+                  <span class="text-xs text-blue-400 font-medium">TCP 已连接</span>
+                  <span class="text-xs text-gray-500 ml-auto font-mono">192.168.1.100:8080</span>
+                </div>
+                <div class="space-y-1.5 font-mono text-xs">
+                  <div class="text-cyan-400">SEND → {"cmd":"status"}</div>
+                  <div class="text-amber-400">RECV ← {"status":"ok","rssi":-65}</div>
+                  <div class="text-cyan-400">SEND → {"cmd":"reboot"}</div>
+                  <div class="text-amber-400">RECV ← {"status":"ack"}</div>
+                  <div class="text-cyan-400">SEND → {"cmd":"get_log"}</div>
+                  <div class="text-amber-400">RECV ← {"log":"boot ok...","len":256}</div>
+                  <div class="text-gray-600">--- connection closed ---</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-20 md:py-28 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">为嵌入式开发者而生</h2>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto">从串口调试到网络通信，一个工具全部搞定</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Feature 1 -->
+        <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
+          <div class="w-12 h-12 bg-brand-50 rounded-xl flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">串口调试</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">支持标准串口参数配置，HEX/ASCII 双模式收发，自动分帧显示，AT 命令一键发送。</p>
+        </div>
+        <!-- Feature 2 -->
+        <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
+          <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">TCP/UDP 网络</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">TCP Client/Server、UDP 收发一键切换，支持多连接管理，实时通信状态监控。</p>
+        </div>
+        <!-- Feature 3 -->
+        <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
+          <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">日志记录</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">完整收发日志带时间戳，支持导出为文本文件，方便问题回溯和团队协作。</p>
+        </div>
+        <!-- Feature 4 -->
+        <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
+          <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">多会话管理</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">同时管理多个串口和网络连接，标签页切换，各会话独立运行互不干扰。</p>
+        </div>
+        <!-- Feature 5 -->
+        <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
+          <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">轻量高效</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">            基于 .NET 10 WPF 原生开发，启动快、占用低。需安装 .NET 10 Desktop Runtime 方可运行。</p>
+        </div>
+        <!-- Feature 6 -->
+        <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
+          <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2">完全免费</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">完全免费，无广告无弹窗，专注工具本身。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download Section -->
+  <section id="download" class="py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="bg-gradient-to-br from-brand-600 to-brand-800 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+          <div class="absolute -top-20 -right-20 w-80 h-80 bg-white rounded-full"></div>
+          <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-white rounded-full"></div>
+        </div>
+        <div class="relative z-10">
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">立即下载</h2>
+          <p class="text-brand-200 text-lg mb-8 max-w-xl mx-auto">需先安装 .NET 10 Desktop Runtime。下载 exe 后直接运行。</p>
+          <a href="https://raw.githubusercontent.com/Jun-323/CommMate/refs/heads/master/CommMate.exe"
+             class="inline-flex items-center gap-2 bg-white text-brand-700 font-bold px-10 py-4 rounded-xl text-lg hover:bg-gray-100 transition shadow-xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            下载 CommMate.exe v1.0.0
+          </a>
+          <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-brand-200">
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              Windows 10/11
+            </span>
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              64 位
+            </span>
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              需 .NET 10 Runtime
+            </span>
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              <a href="https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0" target="_blank" rel="noopener" class="underline hover:text-white transition">下载 Runtime →</a>
+            </span>
+              <span class="flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              完全免费
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Discussions Section -->
+  <section id="discussions" class="py-16 md:py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-2xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 bg-brand-50 text-brand-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+          交流讨论
+        </div>
+        <h2 class="text-2xl md:text-3xl font-bold mb-4">有问题或建议？来聊聊</h2>
+        <p class="text-gray-500 mb-8 leading-relaxed">
+          使用中有疑问、想要新功能、或者想和其他嵌入式开发者交流，都欢迎前往 GitHub Discussions。无需注册也可浏览，登录 GitHub 即可参与讨论。
+        </p>
+        <a href="https://github.com/Jun-323/CommMate/discussions" target="_blank" rel="noopener"
+           class="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold px-8 py-3.5 rounded-xl text-base transition">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          前往 GitHub Discussions
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Changelog Section -->
+  <section id="changelog" class="py-20 md:py-28 bg-gray-50">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">更新日志</h2>
+        <p class="text-gray-500 text-lg">每次更新都在变得更好</p>
+      </div>
+      <div class="space-y-8">
+        <!-- v1.0.0 -->
+        <div class="bg-white rounded-2xl p-7 border border-gray-100">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.0</span>
+            <span class="text-gray-400 text-sm">2026-06-14</span>
+            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md">最新</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-3">首个正式版发布 🎉</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-0.5">+</span>
+              串口调试：支持 HEX/ASCII 双模式收发、自动分帧
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-0.5">+</span>
+              网络调试：TCP Client/Server、UDP 收发
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-0.5">+</span>
+              多会话管理：串口与网络连接并行运行
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-0.5">+</span>
+              日志记录：带时间戳的完整收发日志，支持导出
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-0.5">+</span>
+              配置持久化：用户设置与连接配置本地保存
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="text-center mt-10">
+        <a href="https://github.com/Jun-323/CommMate/releases" target="_blank" rel="noopener"
+           class="text-brand-600 hover:text-brand-700 text-sm font-medium transition">
+          查看全部版本 →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20 md:py-28">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">常见问题</h2>
+      </div>
+      <div class="space-y-4">
+        <details class="bg-white rounded-xl border border-gray-100 group" open>
+          <summary class="p-5 font-medium cursor-pointer flex items-center justify-between">
+            需要安装 .NET 运行时吗？
+            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+            CommMate 需要 .NET 10 Desktop Runtime 才能运行。请先前往微软官网下载安装，Windows 10/11 64 位系统均支持。
+          </div>
+        </details>
+        <details class="bg-white rounded-xl border border-gray-100 group">
+          <summary class="p-5 font-medium cursor-pointer flex items-center justify-between">
+            支持 Windows 7 吗？
+            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+            不支持。CommMate 基于 .NET 10 构建，仅支持 Windows 10 1809 及以上版本的 64 位系统。
+          </div>
+        </details>
+        <details class="bg-white rounded-xl border border-gray-100 group">
+          <summary class="p-5 font-medium cursor-pointer flex items-center justify-between">
+            支持 macOS 或 Linux 吗？
+            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+            目前仅支持 Windows。CommMate 使用 WPF 框架，这是 Windows 原生技术。跨平台版本暂无计划。
+          </div>
+        </details>
+        <details class="bg-white rounded-xl border border-gray-100 group">
+          <summary class="p-5 font-medium cursor-pointer flex items-center justify-between">
+            收费吗？有广告吗？
+            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+            完全免费，无广告、无弹窗、无捆绑。如有问题欢迎通过 GitHub Issues 反馈。
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-400 py-12">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-2">
+          <img src="icon.png" alt="CommMate" class="w-7 h-7 rounded-lg">
+          <span class="font-semibold text-white">CommMate</span>
+        </div>
+        <div class="flex items-center gap-6 text-sm">
+          <a href="#features" class="hover:text-white transition">特性</a>
+          <a href="#download" class="hover:text-white transition">下载</a>
+          <a href="#changelog" class="hover:text-white transition">更新日志</a>
+          <a href="https://github.com/Jun-323/CommMate/discussions" target="_blank" rel="noopener" class="hover:text-white transition">讨论区</a>
+          <a href="https://github.com/Jun-323/CommMate" target="_blank" rel="noopener" class="hover:text-white transition">GitHub</a>
+        </div>
+        <p class="text-sm">&copy; 2026 CommMate. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener('click', () => {
+        const isOpen = !mobileMenu.classList.contains('hidden');
+        mobileMenu.classList.toggle('hidden');
+        menuIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+      });
+      // Close menu when a link is clicked
+      mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+          menuIcon.classList.remove('hidden');
+          closeIcon.classList.add('hidden');
+        });
+      });
+    }
+
+    // Fetch latest version info from version.json (optional, graceful fallback)
+    async function loadVersionInfo() {
+      try {
+        const resp = await fetch('version.json');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        // Update download links
+        const btns = document.querySelectorAll('a[href*="raw.githubusercontent.com"]');
+        btns.forEach(btn => {
+          btn.href = data.downloadUrl || btn.href;
+        });
+        // Update version text
+        const verEl = document.getElementById('version-info');
+        if (verEl && data.version) {
+          verEl.textContent = `v${data.version} · Windows 10+ · 需安装 .NET 10 Runtime`;
+        }
+        // Update download button text
+        const dlBtn = document.querySelector('#download .font-bold');
+        if (dlBtn && data.version) {
+          dlBtn.innerHTML = dlBtn.innerHTML.replace(/v[\d.]+/, `v${data.version}`);
+        }
+      } catch (e) {
+        // version.json not available, static content is fine
+      }
+    }
+    loadVersionInfo();
+  </script>
+</body>
+</html>
