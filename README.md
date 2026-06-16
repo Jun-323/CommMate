@@ -1,27 +1,35 @@
 # CommMate
-CommMate is a powerful serial port and network debugging assistant, designed for embedded development, IoT device debugging, and industrial communication testing.
 
-Key Features:
+[English](#english) | [中文](#chinese)
 
-Serial Port Debugging — Supports standard baud rates, data bits, stop bits, parity, and flow control configurations, compatible with various serial devices
-Network Debugging — Supports TCP client/server and UDP communication, with multi-connection management
-Terminal Emulation — Built-in VT100 terminal emulator with escape sequence support, cursor positioning, and alternate screen buffer
-Data Logging — Automatically records communication data with timestamps, supports both ASCII and Hex display modes
-Quick Commands — Customizable frequently-used command list for one-click sending, improving debugging efficiency
-Timed Sending — Supports periodic data transmission, useful for stress testing or heartbeat simulation
-Multi-language UI — Supports both Chinese and English interface
-Target Users: Embedded engineers, IoT developers, industrial automation technicians, and communication protocol debugging personnel.
+---
 
+<h2 id="english">English</h2>
 
-CommMate 是一款功能强大的串口与网络调试助手，专为嵌入式开发、物联网设备调试及工业通信测试而设计。
+CommMate is a WPF-based serial port and network debugging tool for Windows, combining serial communication, TCP/UDP networking, a VT100 terminal emulator, and offline cheat sheets into a single application.
 
-核心功能：
+## Features
 
-串口调试 — 支持主流波特率、数据位、停止位、校验位及流控配置，兼容各类串口设备
-网络调试 — 支持 TCP 客户端/服务端、UDP 通信，可同时管理多个连接
-终端仿真 — 内置 VT100 终端仿真器，支持转义序列、光标定位及备用屏幕缓冲区
-数据日志 — 自动记录通信数据，支持时间戳、ASCII/Hex 双模式显示
-快捷命令 — 可自定义常用指令列表，一键发送，提升调试效率
-定时发送 — 支持周期性的数据发送，可用于压力测试或心跳包模拟
-多语言界面 — 支持中文与英文界面切换
-适用场景： 嵌入式工程师、物联网开发者、工业自动化技术人员、通信协议调试人员。
+- **Serial Port** — COM port communication with configurable baud rate, data/stop bits, parity, flow control, and framing mode (Timeout / Streaming). Supports hex and text send/receive, timed auto-send, quick command buttons, and TX/RX byte counters.
+- **Network** — TCP Client, TCP Server (multi-client), and UDP modes. Supports local IP binding, broadcast, client management, and full data logging.
+- **Terminal** — VT100-compatible terminal emulator over serial. Handles escape sequences (cursor movement, screen clearing, title changes), local echo, and keyboard input forwarding.
+- **Reference** — Offline lookup tables for ASCII, Git, Linux, Android ADB, and Wi-Fi debugging commands with bilingual descriptions.
+- **Internationalization** — Chinese and English UI, switchable at any time.
+- **Themes** — Light and dark themes with a VS Code-inspired dark palette.
+- **Config Persistence** — Settings auto-saved to and loaded from a JSON file.
+
+---
+
+<h2 id="chinese">中文</h2>
+
+CommMate 是一款基于 WPF 的 Windows 串口与网络调试工具，集串口通信、TCP/UDP 网络通信、VT100 终端仿真和离线速查表于一体。
+
+## 功能特性
+
+- **串口助手** — COM 口通信，支持波特率、数据位、停止位、校验位、流控、分帧模式（超时/流式）配置。支持 Hex / 文本收发、定时自动发送、快捷命令按钮、TX/RX 字节计数。
+- **网络助手** — TCP 客户端、TCP 服务器（多客户端）、UDP 三种模式。支持本地 IP 绑定、广播、客户端管理及完整数据日志。
+- **终端仿真** — 基于串口的 VT100 兼容终端。支持转义序列（光标移动、清屏、标题变更）、本地回显和键盘输入转发。
+- **速查手册** — 离线速查表，涵盖 ASCII 码表、Git、Linux、Android ADB、Wi-Fi 调试命令，中英双语描述。
+- **国际化** — 完整中英文界面，可随时切换。
+- **主题切换** — 亮色 / 暗色主题，暗色采用 VS Code 风格配色。
+- **配置持久化** — 所有设置自动保存到 JSON 文件并在启动时加载。
