@@ -1,0 +1,75 @@
+{
+  "QuickCommands": [
+    {
+      "CommandText": "AT"
+    },
+    {
+      "CommandText": "AT\u002BCSQ"
+    },
+    {
+      "CommandText": "AT\u002BQENG=\u0022servingcell\u0022"
+    },
+    {
+      "CommandText": "AT\u002BCGMI"
+    },
+    {
+      "CommandText": "AT\u002BCGMM"
+    },
+    {
+      "CommandText": "AT\u002BCGSN"
+    },
+    {
+      "CommandText": "AT\u002BCREG?"
+    },
+    {
+      "CommandText": "AT\u002BCOPS?"
+    },
+    {
+      "CommandText": "AT\u002BQNWINFO"
+    },
+    {
+      "CommandText": "AT\u002BCPIN?"
+    },
+    {
+      "CommandText": "AT\u002BCGATT?"
+    },
+    {
+      "CommandText": "AT\u002BCGPADDR=1"
+    },
+    {
+      "CommandText": "AT\u002BQIACT?"
+    },
+    {
+      "CommandText": "AT\u002BQCFG=\u0022band\u0022"
+    },
+    {
+      "CommandText": "AT\u002BCFUN?"
+    }
+  ],
+  "SerialPortName": "",
+  "SerialBaudRate": 115200,
+  "SerialParity": "None",
+  "SerialDataBits": 8,
+  "SerialStopBits": "One",
+  "SerialFlowControl": "None",
+  "SerialFramingMode": "Timeout",
+  "SerialPacketTimeout": 50,
+  "SerialIsHex": false,
+  "SerialShowTimestamp": true,
+  "SerialAutoScroll": true,
+  "SerialAppendNewLine": false,
+  "SerialSelectedNewLineIndex": 0,
+  "NetworkModeIndex": 0,
+  "NetworkRemoteHost": "127.0.0.1",
+  "NetworkRemotePort": 8080,
+  "NetworkLocalPort": 8080,
+  "NetworkLocalBindAddress": "0.0.0.0",
+  "NetworkEnableBroadcast": false,
+  "NetworkIsHex": false,
+  "NetworkShowTimestamp": true,
+  "NetworkAutoScroll": true,
+  "NetworkAppendNewLine": false,
+  "NetworkSelectedNewLineIndex": 0,
+  "IsDarkTheme": false,
+  "Language": "zh"
+}
