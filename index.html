@@ -124,6 +124,7 @@
 
   <!-- Hero Section -->
   <section class="gradient-bg pt-32 pb-20 md:pt-40 md:pb-28 relative overflow-hidden">
+    <canvas id="fireworks-canvas" class="absolute inset-0 z-0 pointer-events-none"></canvas>
     <div class="absolute inset-0 opacity-30">
       <div class="absolute top-20 left-10 w-72 h-72 bg-brand-500 rounded-full filter blur-[120px]"></div>
       <div class="absolute bottom-10 right-20 w-96 h-96 bg-purple-500 rounded-full filter blur-[150px]"></div>
@@ -662,6 +663,170 @@
       } catch (e) {}
     }
     loadVersionInfo();
+  </script>
+
+  <!-- Fireworks -->
+  <script>
+    (function() {
+      const canvas = document.getElementById('fireworks-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      let width, height;
+      const particles = [];
+      const rockets = [];
+      const colors = [
+        '#6366f1', '#818cf8', '#a78bfa', '#c084fc', '#e879f9',
+        '#f472b6', '#fb923c', '#fbbf24', '#34d399', '#22d3ee',
+        '#38bdf8', '#60a5fa', '#f87171', '#a3e635'
+      ];
+
+      function resize() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        width = canvas.width = rect.width;
+        height = canvas.height = rect.height;
+      }
+
+      function random(min, max) { return Math.random() * (max - min) + min; }
+      function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+      class Particle {
+        constructor(x, y, color) {
+          this.x = x;
+          this.y = y;
+          this.color = color || pick(colors);
+          const angle = random(0, Math.PI * 2);
+          const speed = random(1.5, 6);
+          this.vx = Math.cos(angle) * speed;
+          this.vy = Math.sin(angle) * speed;
+          this.life = 1;
+          this.decay = random(0.008, 0.025);
+          this.size = random(1.2, 3);
+        }
+        update() {
+          this.x += this.vx;
+          this.vy += 0.05; // gravity
+          this.y += this.vy;
+          this.vx *= 0.99;
+          this.vy *= 0.99;
+          this.life -= this.decay;
+        }
+        draw(ctx) {
+          ctx.save();
+          ctx.globalAlpha = this.life;
+          ctx.fillStyle = this.color;
+          ctx.shadowColor = this.color;
+          ctx.shadowBlur = 6;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      class Rocket {
+        constructor() {
+          this.x = random(width * 0.15, width * 0.85);
+          this.y = height + 6;
+          this.targetY = random(height * 0.08, height * 0.45);
+          this.vy = -(random(5, 9));
+          this.trail = [];
+          this.color = pick(colors);
+          this.alive = true;
+        }
+        update() {
+          this.trail.push({ x: this.x, y: this.y, life: 1 });
+          if (this.trail.length > 12) this.trail.shift();
+          this.vy += 0.02;
+          this.y += this.vy;
+          if (this.y <= this.targetY) {
+            this.alive = false;
+            this.burst();
+          }
+        }
+        burst() {
+          const count = Math.floor(random(40, 80));
+          const innerColors = [];
+          for (let i = 0; i < 4; i++) innerColors.push(pick(colors));
+          for (let i = 0; i < count; i++) {
+            particles.push(new Particle(this.x, this.y, pick(innerColors)));
+          }
+        }
+        draw(ctx) {
+          // Trail
+          for (let i = 0; i < this.trail.length; i++) {
+            const t = this.trail[i];
+            ctx.save();
+            ctx.globalAlpha = t.life * (i / this.trail.length);
+            ctx.fillStyle = this.color;
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 4;
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, 1.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+            t.life -= 0.08;
+          }
+          // Head
+          ctx.save();
+          ctx.fillStyle = '#fff';
+          ctx.shadowColor = this.color;
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      let launchTimer = 0;
+      const LAUNCH_INTERVAL_MIN = 50;
+      const LAUNCH_INTERVAL_MAX = 120;
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Launch new rockets
+        launchTimer++;
+        const interval = random(LAUNCH_INTERVAL_MIN, LAUNCH_INTERVAL_MAX);
+        if (launchTimer >= interval && rockets.length < 4) {
+          launchTimer = 0;
+          rockets.push(new Rocket());
+        }
+
+        // Update & draw rockets
+        for (let i = rockets.length - 1; i >= 0; i--) {
+          rockets[i].update();
+          rockets[i].draw(ctx);
+          if (!rockets[i].alive) rockets.splice(i, 1);
+        }
+
+        // Update & draw particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          particles[i].update();
+          if (particles[i].life <= 0) {
+            particles.splice(i, 1);
+          } else {
+            particles[i].draw(ctx);
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      // Use IntersectionObserver to pause when off-screen
+      const hero = canvas.parentElement;
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          resize();
+        }
+      }, { threshold: 0 });
+      observer.observe(hero);
+
+      window.addEventListener('resize', resize);
+      resize();
+      animate();
+    })();
   </script>
 </body>
 </html>
