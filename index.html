@@ -133,7 +133,7 @@
       <div class="text-center max-w-3xl mx-auto">
         <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-1.5 text-sm text-brand-300 mb-8">
           <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
-          v1.0 正式发布
+          <span id="hero-badge-text">v1.0 正式发布</span>
         </div>
         <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">
           串口 & 网络调试<br>
@@ -143,7 +143,7 @@
           CommMate 是面向嵌入式开发者的四合一调试工具——串口通信、TCP/UDP 网络、VT100 终端仿真、AT 快捷指令一站式搞定，告别在多个工具之间切换。
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="CommMate.exe" id="download-btn"
+          <a href="https://github.com/Jun-323/CommMate/releases/latest/download/CommMate.exe" id="download-btn-hero"
              class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-3.5 rounded-xl text-base transition shadow-lg shadow-brand-600/30">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -167,7 +167,7 @@
             <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
             <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
             <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
-            <span class="ml-3 text-xs text-gray-500 font-mono">CommMate v1.0.0</span>
+            <span class="ml-3 text-xs text-gray-500 font-mono" id="mockup-version">CommMate v1.0.0</span>
           </div>
           <!-- Tab bar -->
           <div class="flex items-center gap-0 border-b border-white/10">
@@ -416,7 +416,7 @@
         <div class="relative z-10">
           <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">立即下载</h2>
           <p class="text-brand-200 text-lg mb-8 max-w-xl mx-auto">需先安装 .NET 10 Desktop Runtime。下载 exe 后直接运行。</p>
-          <a href="CommMate.exe"
+          <a href="https://github.com/Jun-323/CommMate/releases/latest/download/CommMate.exe" id="download-btn-main"
              class="inline-flex items-center gap-2 bg-white text-brand-700 font-bold px-10 py-4 rounded-xl text-lg hover:bg-gray-100 transition shadow-xl">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -649,18 +649,36 @@
 
     async function loadVersionInfo() {
       try {
-        const resp = await fetch('version.json');
+        const resp = await fetch('https://api.github.com/repos/Jun-323/CommMate/releases/latest');
         if (!resp.ok) return;
         const data = await resp.json();
+        const fullVersion = data.tag_name || '';
+        const version = fullVersion.replace(/^v/, '');
+        if (!version) return;
+
+        // Hero badge
+        const badge = document.getElementById('hero-badge-text');
+        if (badge) badge.textContent = `v${version} 正式发布`;
+
+        // Version info line
         const verEl = document.getElementById('version-info');
-        if (verEl && data.version) {
-          verEl.textContent = `v${data.version} · Windows 10+ · 需安装 .NET 10 Runtime`;
+        if (verEl) verEl.textContent = `v${version} · Windows 10+ · 需安装 .NET 10 Runtime`;
+
+        // Mockup title bar
+        const mockup = document.getElementById('mockup-version');
+        if (mockup) mockup.textContent = `CommMate v${version}`;
+
+        // Download buttons
+        const dlBtnMain = document.getElementById('download-btn-main');
+        if (dlBtnMain) dlBtnMain.childNodes[dlBtnMain.childNodes.length - 1].textContent = `下载 CommMate.exe v${version}`;
+        const dlBtnHero = document.getElementById('download-btn-hero');
+        if (dlBtnHero) {
+          // Update the release URL too
+          dlBtnHero.href = data.html_url || dlBtnHero.href;
         }
-        const dlBtn = document.querySelector('#download .font-bold');
-        if (dlBtn && data.version) {
-          dlBtn.innerHTML = dlBtn.innerHTML.replace(/v[\d.]+/, `v${data.version}`);
-        }
-      } catch (e) {}
+      } catch (e) {
+        // Silently fall back to hardcoded defaults
+      }
     }
     loadVersionInfo();
   </script>
