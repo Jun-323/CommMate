@@ -668,13 +668,16 @@
         const mockup = document.getElementById('mockup-version');
         if (mockup) mockup.textContent = `CommMate v${version}`;
 
-        // Download buttons
+        // Download buttons — use the actual asset download URL from release
+        const downloadUrl = (data.assets && data.assets[0] && data.assets[0].browser_download_url) || null;
         const dlBtnMain = document.getElementById('download-btn-main');
-        if (dlBtnMain) dlBtnMain.childNodes[dlBtnMain.childNodes.length - 1].textContent = `下载 CommMate.exe v${version}`;
+        if (dlBtnMain) {
+          dlBtnMain.lastChild.textContent = ` 下载 CommMate.exe v${version}`;
+          if (downloadUrl) dlBtnMain.href = downloadUrl;
+        }
         const dlBtnHero = document.getElementById('download-btn-hero');
-        if (dlBtnHero) {
-          // Update the release URL too
-          dlBtnHero.href = data.html_url || dlBtnHero.href;
+        if (dlBtnHero && downloadUrl) {
+          dlBtnHero.href = downloadUrl;
         }
       } catch (e) {
         // Silently fall back to hardcoded defaults
