@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>隐私策略 — CommMate</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white text-gray-900 font-sans antialiased">
+
+  <header class="bg-gray-900 text-white py-12">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="flex items-center gap-2 mb-4">
+        <img src="icon.png" alt="CommMate" class="w-8 h-8 rounded-lg">
+        <span class="font-bold text-lg">CommMate</span>
+      </div>
+      <h1 class="text-3xl font-bold">隐私策略</h1>
+      <p class="mt-2 text-gray-400">Privacy Policy</p>
+      <p class="text-gray-400 text-sm">最后更新：2026-06-25</p>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-6 py-12 space-y-8 text-sm leading-relaxed">
+
+    <section>
+      <h2 class="text-lg font-semibold mb-3">概述</h2>
+      <p class="text-gray-600">
+        CommMate（"本应用"）是一款本地运行的 Windows 串口与网络调试工具。我们高度重视用户隐私，本策略说明本应用如何处理用户数据。
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold mb-3">本应用收集哪些数据？</h2>
+      <p class="text-gray-600 font-medium">简答：不收集任何数据。</p>
+      <ul class="list-disc list-inside space-y-2 mt-3 text-gray-600">
+        <li><strong>不收集个人信息</strong> — 本应用不需要账号注册，不收集姓名、邮箱、IP 地址或任何可识别个人身份的信息。</li>
+        <li><strong>不上传数据</strong> — 所有串口通信数据、网络通信数据仅在您的本地设备上处理和显示，不会发送到任何远程服务器。</li>
+        <li><strong>不嵌入分析 SDK</strong> — 本应用不含任何第三方分析、广告或追踪组件。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold mb-3">本地存储的数据</h2>
+      <p class="text-gray-600">
+        为了记住您的使用偏好，本应用会在您的本地设备上保存一个配置文件：
+      </p>
+      <ul class="list-disc list-inside space-y-2 mt-3 text-gray-600">
+        <li><strong>文件位置</strong>：<code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">%LOCALAPPDATA%\CommMate\commmate.json</code></li>
+        <li><strong>包含内容</strong>：界面主题（亮色/暗色）、语言偏好（中文/英文）、最近使用的串口/网络配置、快捷命令列表、窗口布局设置。</li>
+        <li><strong>不包含的内容</strong>：通信日志、收发数据、密码或任何敏感信息。（通信日志仅当您主动通过"保存"按钮导出时才写入您指定的位置。）</li>
+        <li>此文件完全存储在您的本地设备上，<strong>不会上传</strong>到任何服务器。</li>
+        <li>卸载本应用后，您可以手动删除此目录以清除所有残留配置。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold mb-3">网络访问</h2>
+      <p class="text-gray-600">
+        本应用在以下极少数场景下会访问网络：
+      </p>
+      <ul class="list-disc list-inside space-y-2 mt-3 text-gray-600">
+        <li><strong>检查更新</strong> — 当您手动点击"检查更新"时，本应用会向 GitHub Releases API 发送一次 HTTPS 请求以获取最新版本信息。此请求不包含任何个人数据。</li>
+        <li><strong>串口 / 网络通信</strong> — 作为调试工具，本应用会根据您的操作发起串口通信或 TCP/UDP 网络连接。这些通信完全由您控制，应用不会自动发起任何网络连接。</li>
+      </ul>
+      <p class="mt-3 text-gray-600">本应用不会在后台自动联网、不会上报使用统计、不会进行任何形式的遥测。</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold mb-3">第三方服务</h2>
+      <p class="text-gray-600">
+        本应用不集成任何第三方分析、广告或数据追踪服务。唯一的第三方依赖是 .NET 运行时库（Microsoft 提供），其隐私策略请参见
+        <a href="https://privacy.microsoft.com/zh-cn/privacystatement" class="text-blue-600 underline" target="_blank" rel="noopener">Microsoft 隐私声明</a>。
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold mb-3">数据的共享与披露</h2>
+      <p class="text-gray-600">
+        本应用不收集个人数据，因此不会、也无法与任何第三方共享您的数据。我们不会出售、出租或交易任何信息。
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold mb-3">儿童隐私</h2>
+      <p class="text-gray-600">
+        本应用不会故意收集 13 岁以下儿童的个人信息。如果您认为我们无意中收集了此类信息，请联系我们以便立即删除。
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold mb-3">政策更新</h2>
+      <p class="text-gray-600">
+        本隐私策略可能会不时更新。更新后的版本将发布在此页面，并在页面顶部标注更新日期。
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold mb-3">联系我们</h2>
+      <p class="text-gray-600">
+        如果您对本隐私策略有任何疑问，请通过以下渠道联系：
+      </p>
+      <ul class="list-disc list-inside space-y-1 mt-3 text-gray-600">
+        <li>GitHub Issues：<a href="https://github.com/Jun-323/CommMate/issues" class="text-blue-600 underline" target="_blank" rel="noopener">https://github.com/Jun-323/CommMate/issues</a></li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="bg-gray-100 py-8">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <p class="text-xs text-gray-400">&copy; 2026 CommMate. All rights reserved. &nbsp;|&nbsp; <a href="index.html" class="hover:text-gray-600 transition">返回首页</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

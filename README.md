@@ -37,6 +37,10 @@
 | `Ctrl+C` | Reference panel | Copy selection |
 | Arrow keys, F1–F12, Home/End, Del, Tab, Esc, Backspace | Terminal | VT100 sequence |
 
+## Privacy
+
+This app does not collect or upload any personal data. See the [Privacy Policy](https://jun-323.github.io/CommMate/privacy) for details.
+
 ---
 
 <h2 id="chinese">中文</h2>
@@ -71,3 +75,7 @@
 | `Ctrl+Enter` | 发送框 | 换行（不发送） |
 | `Ctrl+C` | 速查面板 | 复制选中 |
 | 方向键、F1–F12、Home/End、Del、Tab、Esc、Backspace | 终端面板 | VT100 序列 |
+
+## 隐私策略
+
+本应用不收集、不上传任何个人数据。详见 [隐私策略](https://jun-323.github.io/CommMate/privacy)。
