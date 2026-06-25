@@ -37,6 +37,10 @@
 | `Ctrl+C` | Reference panel | Copy selection |
 | Arrow keys, F1–F12, Home/End, Del, Tab, Esc, Backspace | Terminal | VT100 sequence |
 
+## Requirements
+
+This application depends on [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0). Please install it before running CommMate.
+
 ## Privacy
 
 This app does not collect or upload any personal data. See the [Privacy Policy](https://jun-323.github.io/CommMate/privacy) for details.
@@ -75,6 +79,10 @@ This app does not collect or upload any personal data. See the [Privacy Policy](
 | `Ctrl+Enter` | 发送框 | 换行（不发送） |
 | `Ctrl+C` | 速查面板 | 复制选中 |
 | 方向键、F1–F12、Home/End、Del、Tab、Esc、Backspace | 终端面板 | VT100 序列 |
+
+## 运行要求
+
+本应用依赖 [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0)，运行前请先安装。
 
 ## 隐私策略
 
