@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "updated": "2026-06-27",
+  "scripts": [
+    {
+      "path": "Quectel/EC801E/基础AT测试.cmds",
+      "name": "基础AT测试",
+      "brand": "Quectel",
+      "model": "EC801E",
+      "category": "基础",
+      "description": "查询模块信息、IMEI、SIM状态、信号质量、网络注册",
+      "version": 1
+    },
+    {
+      "path": "Quectel/EC801E/TCP_Client.cmds",
+      "name": "TCP Client",
+      "brand": "Quectel",
+      "model": "EC801E",
+      "category": "TCP",
+      "description": "TCP客户端：PDP激活 → QIOPEN连接 → QISEND发送 → QICLOSE关闭",
+      "version": 1
+    },
+    {
+      "path": "Quectel/EC801E/HTTP_GET.cmds",
+      "name": "HTTP GET",
+      "brand": "Quectel",
+      "model": "EC801E",
+      "category": "HTTP",
+      "description": "HTTP GET请求：QHTTPCFG配置 → QHTTPURL设置 → QHTTPGET请求 → QHTTPREAD读取",
+      "version": 1
+    },
+    {
+      "path": "Quectel/EC801E/MQTT_Connect.cmds",
+      "name": "MQTT连接",
+      "brand": "Quectel",
+      "model": "EC801E",
+      "category": "MQTT",
+      "description": "MQTT连接测试：QMTOPEN → QMTCONN → QMTSUB → QMTPUB → QMTDISC",
+      "version": 1
+    },
+    {
+      "path": "通用/基础AT测试.cmds",
+      "name": "基础AT测试",
+      "brand": "通用",
+      "model": "通用",
+      "category": "基础",
+      "description": "跨模组通用基础AT指令：AT → CGMI → CGSN → CSQ → CREG → COPS",
+      "version": 1
+    },
+    {
+      "path": "通用/信号质量检查.cmds",
+      "name": "信号质量检查",
+      "brand": "通用",
+      "model": "通用",
+      "category": "监控",
+      "description": "循环10次查询CSQ信号质量，每次间隔2秒",
+      "version": 1
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+# ============================
+# EC801E 基础 AT 指令测试
+# 查询模块信息、SIM状态、网络注册
+# ============================
+
+LOG "=== EC801E 基础 AT 测试开始 ==="
+
+SEND AT
+EXPECT "OK" 3000
+IF TIMEOUT GOTO fail
+
+# 模块厂商
+SEND AT+CGMI
+EXPECT "OK" 3000
+
+# 模块型号
+SEND AT+CGMM
+EXPECT "OK" 3000
+
+# 固件版本
+SEND AT+QGMR
+EXPECT "OK" 3000
+
+# IMEI
+SEND AT+CGSN
+EXPECT "\d{15}" 5000 -> imei
+LOG "IMEI: $imei"
+
+# SIM 状态
+SEND AT+CPIN?
+EXPECT "OK" 3000
+
+# 信号质量
+SEND AT+CSQ
+EXPECT "\+CSQ:\s*(\d+)" 3000 -> csq
+LOG "信号值: $csq"
+
+# 网络注册状态
+SEND AT+CREG?
+EXPECT "OK" 3000
+
+# 运营商
+SEND AT+COPS?
+EXPECT "OK" 5000
+
+# 查询 IMSI
+SEND AT+CIMI
+EXPECT "\d{15}" 5000 -> imsi
+LOG "IMSI: $imsi"
+
+# 查询 ICCID
+SEND AT+QCCID
+EXPECT "OK" 3000
+
+# PDP 上下文配置
+SEND AT+QICSGP=1,1,"CMNET","","",0
+EXPECT "OK" 3000
+
+# 激活 PDP
+SEND AT+QIACT=1
+EXPECT "OK" 5000
+
+# 查询 IP
+SEND AT+QIACT?
+EXPECT "OK" 3000
+
+GOTO done
+
+:fail
+LOG "!!! 基础 AT 测试失败：模块无响应 !!!"
+
+:done
+LOG "=== 基础 AT 测试完成 ==="

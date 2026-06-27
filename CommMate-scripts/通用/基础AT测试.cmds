@@ -1,0 +1,44 @@
+# ============================
+# 基础 AT 指令测试
+# 适用于大多数蜂窝模组
+# ============================
+
+LOG "=== 基础 AT 测试开始 ==="
+
+SEND AT
+EXPECT "OK" 3000
+IF TIMEOUT GOTO fail
+
+SEND AT+CGMI
+EXPECT "OK" 3000
+
+SEND AT+CGMM
+EXPECT "OK" 3000
+
+SEND AT+CGSN
+EXPECT "\d{15}" 5000 -> imei
+LOG "IMEI: $imei"
+
+SEND AT+CPIN?
+EXPECT "OK" 3000
+
+SEND AT+CSQ
+EXPECT "\+CSQ:\s*(\d+)" 3000 -> csq
+LOG "信号值: $csq"
+
+SEND AT+CREG?
+EXPECT "OK" 3000
+
+SEND AT+COPS?
+EXPECT "OK" 5000
+
+SEND AT+CGATT?
+EXPECT "OK" 3000
+
+GOTO done
+
+:fail
+LOG "!!! 基础 AT 测试失败：模块无响应 !!!"
+
+:done
+LOG "=== 基础 AT 测试完成 ==="

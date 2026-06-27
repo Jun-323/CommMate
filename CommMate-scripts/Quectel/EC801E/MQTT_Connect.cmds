@@ -1,0 +1,72 @@
+# ============================
+# EC801E MQTT 连接 & 发布测试
+# 使用 QMTOPEN / QMTCONN / QMTPUB
+# ============================
+
+LOG "=== EC801E MQTT 测试 ==="
+
+# 1. 基础检查
+SEND AT
+EXPECT "OK" 3000
+IF TIMEOUT GOTO fail
+
+# 2. 激活 PDP
+SEND AT+QICSGP=1,1,"CMNET","","",0
+EXPECT "OK" 3000
+
+SEND AT+QIACT=1
+EXPECT "OK" 5000
+
+SEND AT+QIACT?
+EXPECT "OK" 3000
+
+# 3. 打开 MQTT 网络
+# QMTOPEN=<connectID>,<host>,<port>
+SEND AT+QMTOPEN=0,"test.mosquitto.org",1883
+EXPECT "\+QMTOPEN:\s*0,0" 15000
+IF TIMEOUT GOTO fail
+
+LOG "MQTT 网络已打开"
+
+# 4. 连接 MQTT Broker
+# QMTCONN=<connectID>,<clientID>[,<username>,<password>]
+SEND AT+QMTCONN=0,"EC801E_Test"
+EXPECT "\+QMTCONN:\s*0,0,0" 10000
+IF TIMEOUT GOTO mqtt_fail
+
+LOG "MQTT 已连接 Broker"
+
+# 5. 订阅主题
+# QMTSUB=<connectID>,<msgID>,<topic>,<qos>
+SEND AT+QMTSUB=0,1,"test/topic",0
+EXPECT "\+QMTSUB:\s*0,1,0" 5000
+
+# 6. 发布消息
+# QMTPUB=<connectID>,<msgID>,<qos>,<retain>,<topic>
+SEND AT+QMTPUB=0,1,0,0,"test/topic"
+EXPECT ">" 5000
+SENDN {"msg":"Hello from EC801E"}
+
+# 等待 PUB 确认
+WAIT 3000
+
+# 7. 断开 MQTT
+SEND AT+QMTDISC=0
+EXPECT "\+QMTDISC:\s*0,0" 5000
+
+GOTO done
+
+:mqtt_fail
+LOG "MQTT 连接失败"
+SEND AT+QMTCLOSE=0
+EXPECT "OK" 3000
+GOTO fail
+
+:fail
+LOG "!!! MQTT 测试失败 !!!"
+
+:done
+# 清理
+SEND AT+QIDEACT=1
+EXPECT "OK" 5000
+LOG "=== MQTT 测试完成 ==="

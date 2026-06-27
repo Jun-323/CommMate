@@ -1,0 +1,76 @@
+# ============================
+# EC801E TCP Client 连接测试
+# 使用 QIOPEN / QISEND / QICLOSE
+# ============================
+
+LOG "=== EC801E TCP Client 测试 ==="
+
+# 1. 基础检查
+SEND AT
+EXPECT "OK" 3000
+IF TIMEOUT GOTO fail
+
+# 2. 查信号
+SEND AT+CSQ
+EXPECT "\+CSQ:\s*(\d+)" 3000 -> csq
+LOG "信号值: $csq"
+
+# 3. 查网络注册
+SEND AT+CREG?
+EXPECT "OK" 3000
+
+# 4. 配置 PDP 上下文
+SEND AT+QICSGP=1,1,"CMNET","","",0
+EXPECT "OK" 3000
+
+# 5. 激活 PDP
+SEND AT+QIACT=1
+EXPECT "OK" 5000
+
+# 6. 查询 IP
+SEND AT+QIACT?
+EXPECT "OK" 3000
+
+# 7. 打开 TCP socket
+# QIOPEN=<connectID>,<serviceType>,"TCP",<host>,<port>,<localPort>,<accessMode>
+LOG "正在建立 TCP 连接..."
+SEND AT+QIOPEN=1,0,"TCP","120.79.xxx.xxx",8888,0,0
+EXPECT "\+QIOPEN:\s*1,0" 15000
+IF OK GOTO connected
+
+# 重试一次
+LOG "连接超时，重试..."
+WAIT 2000
+SEND AT+QIOPEN=1,0,"TCP","120.79.xxx.xxx",8888,0,0
+EXPECT "\+QIOPEN:\s*1,0" 15000
+IF OK GOTO connected
+
+LOG "TCP 连接失败"
+GOTO fail
+
+:connected
+LOG "TCP 连接成功"
+
+# 8. 发送数据（QISEND + 等待 > 提示）
+SEND AT+QISEND=1,12
+EXPECT ">" 5000
+SENDN Hello World!
+
+# 9. 等待接收
+WAIT 3000
+
+# 10. 关闭 socket
+SEND AT+QICLOSE=1
+EXPECT "OK" 5000
+
+# 11. 去激活 PDP
+SEND AT+QIDEACT=1
+EXPECT "OK" 5000
+
+GOTO done
+
+:fail
+LOG "!!! TCP Client 测试失败 !!!"
+
+:done
+LOG "=== TCP Client 测试完成 ==="

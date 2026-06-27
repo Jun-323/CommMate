@@ -1,0 +1,28 @@
+# ============================
+# 信号质量持续检查
+# 循环发送 AT+CSQ 10 次，每次间隔 2 秒
+# ============================
+
+LOG "=== 信号质量检查开始 ==="
+
+SEND AT
+EXPECT "OK" 3000
+IF TIMEOUT GOTO fail
+
+SET count = 0
+
+REPEAT 10
+    SEND AT+CSQ
+    EXPECT "\+CSQ:\s*(\d+),\s*(\d+)" 3000 -> csq
+    LOG "第 $count 次 — 信号值: $csq"
+    WAIT 2000
+    SET count = $count + 1
+END
+
+GOTO done
+
+:fail
+LOG "!!! 模块无响应 !!!"
+
+:done
+LOG "=== 信号质量检查完成 ==="

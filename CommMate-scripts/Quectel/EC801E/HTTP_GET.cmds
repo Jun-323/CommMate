@@ -1,0 +1,62 @@
+# ============================
+# EC801E HTTP GET 请求测试
+# 使用 QHTTPCFG / QHTTPURL / QHTTPGET
+# ============================
+
+LOG "=== EC801E HTTP GET 测试 ==="
+
+# 1. 基础检查
+SEND AT
+EXPECT "OK" 3000
+IF TIMEOUT GOTO fail
+
+# 2. 配置 PDP 并激活
+SEND AT+QICSGP=1,1,"CMNET","","",0
+EXPECT "OK" 3000
+
+SEND AT+QIACT=1
+EXPECT "OK" 5000
+
+SEND AT+QIACT?
+EXPECT "OK" 3000
+
+# 3. 配置 HTTP 参数
+# QHTTPCFG 设置 PDP 上下文 ID
+SEND AT+QHTTPCFG="contextid",1
+EXPECT "OK" 3000
+
+# 启用响应头
+SEND AT+QHTTPCFG="responseheader",1
+EXPECT "OK" 3000
+
+# 启用超时自动重试
+SEND AT+QHTTPCFG="requesttimeout",30
+EXPECT "OK" 3000
+
+# 4. 设置请求 URL
+# QHTTPURL=<len>,<timeout>
+SEND AT+QHTTPURL=27,30
+EXPECT "CONNECT" 5000
+SENDN http://httpbin.org/get
+
+# 5. 发起 GET 请求
+# QHTTPGET=<timeout>
+SEND AT+QHTTPGET=60
+EXPECT "\+QHTTPGET:" 15000
+
+# 6. 读取响应
+WAIT 1000
+SEND AT+QHTTPREAD=30
+EXPECT "OK" 10000
+
+# 7. 释放 HTTP
+SEND AT+QIDEACT=1
+EXPECT "OK" 5000
+
+GOTO done
+
+:fail
+LOG "!!! HTTP GET 测试失败 !!!"
+
+:done
+LOG "=== HTTP GET 测试完成 ==="
