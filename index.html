@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" id="html-root">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CommMate - 串口 & 网络调试助手</title>
-  <meta name="description" content="CommMate 是一款面向嵌入式开发者的轻量高效串口与网络调试工具，支持串口通信、TCP/UDP 网络、VT100 终端仿真、AT 快捷指令，基于 .NET 10 WPF 构建。">
+  <title id="page-title">CommMate - 串口 &amp; 网络调试助手</title>
+  <meta name="description" id="meta-desc" content="CommMate 是一款面向嵌入式开发者的轻量高效串口与网络调试工具，支持串口通信、TCP/UDP 网络、VT100 终端仿真、AT 快捷指令，基于 .NET 10 WPF 构建。">
   <link rel="icon" type="image/png" href="icon.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -72,7 +72,298 @@
       border-bottom: 2px solid #818cf8;
       color: #c7d2fe;
     }
+    /* Language switcher */
+    .lang-btn {
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid #d1d5db;
+      background: transparent;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+    .lang-btn:hover { border-color: #6366f1; color: #4f46e5; }
+    .lang-btn.active { background: #6366f1; color: #fff; border-color: #6366f1; }
   </style>
+  <!-- I18n Dictionary & Engine -->
+  <script>
+    const I18N = {
+      zh: {
+        'page.title': 'CommMate - 串口 & 网络调试助手',
+        'meta.desc': 'CommMate 是一款面向嵌入式开发者的轻量高效串口与网络调试工具，支持串口通信、TCP/UDP 网络、VT100 终端仿真、AT 快捷指令，基于 .NET 10 WPF 构建。',
+        'nav.features': '特性',
+        'nav.tech': '技术亮点',
+        'nav.download': '下载',
+        'nav.changelog': '更新日志',
+        'nav.discuss': '讨论',
+        'nav.menu': '打开菜单',
+        'hero.badge': 'v{version} 正式发布',
+        'hero.h1a': '串口 & 网络调试',
+        'hero.h1b': '就该这么简单',
+        'hero.desc': 'CommMate 是面向嵌入式开发者的五合一调试工具——串口通信、TCP/UDP 网络、VT100 终端仿真、AT 指令脚本引擎、离线速查手册一站式搞定，告别在多个工具之间切换。',
+        'hero.download': '免费下载 Windows 版',
+        'hero.github': '查看 GitHub',
+        'hero.version.info': 'v{version} · Windows 10+ · 需安装 .NET 10 Runtime',
+        'mockup.serial': '串口',
+        'mockup.network': '网络',
+        'mockup.terminal': '终端',
+        'mockup.script': '脚本',
+        'mockup.ref': '速查',
+        'mockup.serial.connected': '串口已连接',
+        'mockup.script.title': 'AT 指令脚本',
+        'mockup.script.running': '▶ 运行中',
+        'mockup.script.comment': '# EC801E 基础 AT 测试',
+        'mockup.script.log': '[LOG] 信号值: 23',
+        'mockup.terminal.title': 'VT100 终端',
+        'mockup.network.client': 'TCP Client',
+        'section.features': '为嵌入式开发者而生',
+        'section.features.sub': '串口、网络、终端、脚本、速查——五合一，一个工具全部搞定',
+        'feat.serial.title': '串口调试',
+        'feat.serial.desc': '支持全部标准串口参数配置，HEX / ASCII 双模式收发。超时帧与流模式两种分帧策略，适配 AT 指令与透传场景。实时热插拔检测，插拔即刷新端口列表。',
+        'feat.network.title': 'TCP / UDP 网络',
+        'feat.network.desc': 'TCP Client、TCP Server、UDP 三种模式一键切换。TCP 支持多客户端连接管理，UDP 支持广播收发，提供 5 秒超时保护与后台任务自动清理。',
+        'feat.terminal.title': 'VT100 终端仿真',
+        'feat.terminal.desc': '完整 VT100 转义序列解析引擎，支持光标移动、清屏、颜色/样式属性。自适应窗口尺寸，亮暗主题配色跟随，粘性滚动保留历史查看，一键导出日志文本。',
+        'feat.script.title': 'AT 指令脚本引擎',
+        'feat.script.desc': '自定义 DSL 语法，支持 SEND / EXPECT / WAIT / SET 变量 / IF GOTO 控制流 / REPEAT WHILE 循环。脚本按品牌型号管理，内置编辑器，支持导入导出 .cmds 文件，在线脚本库持续更新。',
+        'feat.ref.title': '离线速查表',
+        'feat.ref.desc': '内置 5 类离线速查手册：ASCII 码表、Git 命令、Linux 命令、Android 调试、WiFi 调试——500+ 条命令，无需联网，选中即复制。',
+        'feat.log.title': '日志记录',
+        'feat.log.desc': '完整收发日志带毫秒级时间戳，HEX 与 ASCII 双栏对照显示，支持复制与导出为文本文件。发送字节数实时统计，方便问题回溯。',
+        'feat.i18n.title': '中英双语 & 主题切换',
+        'feat.i18n.desc': '完整中英文界面，自定义 MarkupExtension 实现运行时语言切换。亮色 / 暗色双主题，DynamicResource 驱动即时生效，无闪烁。',
+        'feat.multitab.title': '多面板并行',
+        'feat.multitab.desc': '串口、网络、终端、脚本、速查五个功能面板独立运行互不干扰。全局端口互斥机制防止同一端口被多个面板同时占用，安全可靠。',
+        'feat.free.title': '完全免费',
+        'feat.free.desc': '完全免费，无广告无弹窗无捆绑。.NET 10 WPF 原生开发，启动快内存低，专注工具本身。',
+        'section.tech': '技术亮点',
+        'section.tech.sub': '不仅功能全面，代码本身也是一份 WPF MVVM 的实践参考',
+        'tech.mvvm.title': '严格 MVVM 架构',
+        'tech.mvvm.desc': '基于 CommunityToolkit.Mvvm 源生成器，零样板代码。Models / Services / ViewModels / Views 四层分离，职责边界清晰。',
+        'tech.thread.title': '后台线程 Offload',
+        'tech.thread.desc': 'HEX / ASCII 转换在数据接收线程完成，BeginInvoke 异步投递 UI 更新，不阻塞接收线程，高频数据场景吞吐量优异。',
+        'tech.vt.title': 'VT100 终端引擎',
+        'tech.vt.desc': '手写转义序列解析器，支持 SGR 颜色 / 样式、光标定位、清屏。ConcurrentQueue 缓冲 + 空闲即时渲染 / 忙碌 30ms 批处理双模切换，自适应窗口尺寸，主题跟随配色。',
+        'tech.dsl.title': '自定义 DSL 脚本引擎',
+        'tech.dsl.desc': '手写词法分析器 + 递归下降语法分析器，支持变量、正则匹配、控制流、循环。脚本树文件浏览器 + 文件监控自动刷新 + 在线脚本库。',
+        'tech.framing.title': '智能分帧引擎',
+        'tech.framing.desc': '超时模式静默期后整包输出，专为 AT 指令响应优化；流式模式即时转发，适用透传场景。根据调试场景自由切换，精准控制数据边界。',
+        'tech.guard.title': '三层异常兜底',
+        'tech.guard.desc': 'UI 线程、后台 Task、AppDomain 三层未处理异常全局捕获。串口 / 网络 I/O 带超时保护，Dispose 模式确保资源正确释放。',
+        'section.download': '立即下载',
+        'download.hint': '需先安装 .NET 10 Desktop Runtime。下载 exe 后直接运行。',
+        'download.btn': '下载 CommMate.exe v{version}',
+        'download.win': 'Windows 10/11',
+        'download.arch': '64 位',
+        'download.dotnet': '需 .NET 10 Runtime',
+        'download.dotnet.link': '下载 .NET Runtime →',
+        'download.free': '完全免费',
+        'section.changelog': '更新日志',
+        'changelog.sub': '每次更新都在变得更好',
+        'changelog.latest': '最新',
+        'changelog.v2.title': 'v1.0.2 更新',
+        'changelog.v2.i0': '终端自适应窗口：行列数根据窗口尺寸和字体大小实时计算，不再固定 80×24',
+        'changelog.v2.i1': '终端粘性底部：向上翻阅时暂停自动滚动，回到底部自动恢复，方便查看历史输出',
+        'changelog.v2.i2': '终端保存日志：一键导出终端可见文本到 .txt/.log 文件',
+        'changelog.v2.i3': '终端配色跟随主题：浅色/深色主题下自动调整文字与背景对比度',
+        'changelog.v2.i4': '关于窗口新增 CommMate Cloud 链接（www.commmate.cn）',
+        'changelog.v2.i5': '修复浅色主题下终端文本对比度低、按钮边框缺失、字体裁切等问题',
+        'changelog.v2.i6': '优化终端渲染延迟：空闲时立即处理数据，提升按键响应速度',
+        'changelog.v2.i7': '移除本地回显，终端输入完全依赖远端设备回声',
+        'changelog.v1.title': 'v1.0.1 更新',
+        'changelog.v1.i0': '全新 AT 指令脚本引擎：自定义 DSL 语法，支持 SEND / EXPECT / WAIT / SET 变量 / IF GOTO / REPEAT WHILE / ASSERT / LOG',
+        'changelog.v1.i1': '脚本树浏览器：按品牌/型号层级管理 .cmds 脚本文件，支持新建、编辑、保存、删除',
+        'changelog.v1.i2': '脚本导入/导出：支持从外部导入 .cmds 文件，导出到任意目录',
+        'changelog.v1.i3': '在线脚本库：一键跳转 GitHub 脚本仓库，获取社区共享的 AT 测试脚本',
+        'changelog.v1.i4': '修复 Hex 解析中 0x 前缀跳过偏移量错误',
+        'changelog.v1.i5': '新增 HexHelper.BytesToHexString 方法',
+        'section.faq': '常见问题',
+        'faq.q1': '需要安装 .NET 运行时吗？',
+        'faq.a1': 'CommMate 需要 .NET 10 Desktop Runtime 才能运行。请先前往 <a href="https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0" class="text-brand-600 underline" target="_blank" rel="noopener">微软官网</a> 下载安装，Windows 10/11 64 位系统均支持。',
+        'faq.q2': 'CommMate 和市面上的串口助手有什么不同？',
+        'faq.a2': '集串口通信、TCP/UDP 网络、VT100 终端仿真、离线速查表于一体，无需在多个工具间切换。MVVM 架构清晰，无广告无捆绑。',
+        'faq.q3': '支持 Windows 7 吗？',
+        'faq.a3': '不支持。CommMate 基于 .NET 10 构建，仅支持 Windows 10 1809 及以上版本的 64 位系统。',
+        'faq.q4': '支持 macOS 或 Linux 吗？',
+        'faq.a4': '目前仅支持 Windows。CommMate 使用 WPF 框架，这是 Windows 原生 UI 技术。跨平台版本暂无计划。',
+        'faq.q5': '收费吗？有广告吗？',
+        'faq.a5': '完全免费，无广告、无弹窗、无捆绑。如有问题欢迎通过官方渠道反馈。',
+        'section.discuss': '交流讨论',
+        'discuss.title': '有问题或建议？来聊聊',
+        'discuss.desc': '使用中有疑问、想要新功能、或者想和其他嵌入式开发者交流，都欢迎前往 GitHub Discussions。',
+        'discuss.btn': '前往 GitHub Discussions',
+        'footer.features': '特性',
+        'footer.tech': '技术亮点',
+        'footer.download': '下载',
+        'footer.changelog': '更新日志',
+        'footer.discuss': '讨论区',
+        'footer.privacy': '隐私策略',
+        'footer.copyright': '© 2026 CommMate. All rights reserved.',
+      },
+      en: {
+        'page.title': 'CommMate - Serial & Network Debug Tool',
+        'meta.desc': 'CommMate is a lightweight, efficient serial and network debugging tool for embedded developers. Supports serial communication, TCP/UDP networking, VT100 terminal emulation, AT command shortcuts. Built on .NET 10 WPF.',
+        'nav.features': 'Features',
+        'nav.tech': 'Tech',
+        'nav.download': 'Download',
+        'nav.changelog': 'Changelog',
+        'nav.discuss': 'Discuss',
+        'nav.menu': 'Open menu',
+        'hero.badge': 'v{version} Released',
+        'hero.h1a': 'Serial & Network Debugging',
+        'hero.h1b': 'So Easy',
+        'hero.desc': 'CommMate is an all-in-one debugging toolkit for embedded developers — Serial, TCP/UDP networking, VT100 terminal emulation, AT command scripting engine, and offline cheat sheets in one place. No more juggling between tools.',
+        'hero.download': 'Free Download for Windows',
+        'hero.github': 'View on GitHub',
+        'hero.version.info': 'v{version} · Windows 10+ · Requires .NET 10 Runtime',
+        'mockup.serial': 'Serial',
+        'mockup.network': 'Network',
+        'mockup.terminal': 'Terminal',
+        'mockup.script': 'Script',
+        'mockup.ref': 'Reference',
+        'mockup.serial.connected': 'Serial Connected',
+        'mockup.script.title': 'AT Command Script',
+        'mockup.script.running': '▶ Running',
+        'mockup.script.comment': '# EC801E Basic AT Test',
+        'mockup.script.log': '[LOG] Signal: 23',
+        'mockup.terminal.title': 'VT100 Terminal',
+        'mockup.network.client': 'TCP Client',
+        'section.features': 'Built for Embedded Developers',
+        'section.features.sub': 'Serial, Network, Terminal, Script, Reference — five tools in one',
+        'feat.serial.title': 'Serial Debugging',
+        'feat.serial.desc': 'Full serial port configuration with HEX / ASCII dual-mode TX/RX. Timeout framing for AT commands and streaming mode for passthrough. Real-time hot-plug detection with automatic port list refresh.',
+        'feat.network.title': 'TCP / UDP Networking',
+        'feat.network.desc': 'TCP Client, TCP Server, and UDP modes with one-click switching. Multi-client management for TCP Server, broadcast support for UDP, with 5-second timeout protection and automatic background task cleanup.',
+        'feat.terminal.title': 'VT100 Terminal Emulation',
+        'feat.terminal.desc': 'Full VT100 escape sequence parsing engine supporting cursor movement, screen clearing, color/style attributes. Adaptive window sizing, theme-aware colors, sticky scroll for history review, one-click log export.',
+        'feat.script.title': 'AT Command Script Engine',
+        'feat.script.desc': 'Custom DSL supporting SEND / EXPECT / WAIT / SET variables / IF GOTO control flow / REPEAT WHILE loops. Scripts organized by brand/model, with inline editor, import/export for .cmds files, and online script library.',
+        'feat.ref.title': 'Offline Cheat Sheets',
+        'feat.ref.desc': '5 built-in offline reference manuals: ASCII table, Git commands, Linux commands, Android debugging, Wi-Fi debugging — 500+ commands available offline, select to copy.',
+        'feat.log.title': 'Log Recording',
+        'feat.log.desc': 'Full TX/RX logs with millisecond timestamps, HEX/ASCII side-by-side display, support for copy and export to text files. Real-time byte count statistics for easy troubleshooting.',
+        'feat.i18n.title': 'Bilingual & Theme Switching',
+        'feat.i18n.desc': 'Full Chinese/English interface with custom MarkupExtension for runtime language switching. Light/dark dual themes driven by DynamicResource for instant, flicker-free switching.',
+        'feat.multitab.title': 'Multi-Panel Parallel',
+        'feat.multitab.desc': 'Five functional panels — Serial, Network, Terminal, Script, Reference — run independently without interference. Global port mutual exclusion prevents concurrent access to the same port.',
+        'feat.free.title': 'Completely Free',
+        'feat.free.desc': 'Completely free, no ads, no popups, no bundled software. Built with .NET 10 WPF for fast startup and low memory usage. Focus on the tool itself.',
+        'section.tech': 'Tech Highlights',
+        'section.tech.sub': 'Not just feature-rich — the codebase itself is a WPF MVVM reference',
+        'tech.mvvm.title': 'Strict MVVM Architecture',
+        'tech.mvvm.desc': 'Built on CommunityToolkit.Mvvm source generators with zero boilerplate. Clean four-layer separation: Models / Services / ViewModels / Views with clear responsibility boundaries.',
+        'tech.thread.title': 'Background Thread Offload',
+        'tech.thread.desc': 'HEX/ASCII conversion runs on the data receive thread; BeginInvoke dispatches UI updates asynchronously. Receive thread never blocks, delivering excellent throughput in high-frequency data scenarios.',
+        'tech.vt.title': 'VT100 Terminal Engine',
+        'tech.vt.desc': 'Hand-written escape sequence parser supporting SGR colors/styles, cursor positioning, and screen clearing. ConcurrentQueue buffer with dual-mode rendering: instant when idle, 30ms batch when busy. Adaptive sizing, theme-aware colors.',
+        'tech.dsl.title': 'Custom DSL Script Engine',
+        'tech.dsl.desc': 'Hand-written lexer + recursive descent parser supporting variables, regex matching, control flow, and loops. Script tree file browser + file watcher auto-refresh + online script library.',
+        'tech.framing.title': 'Smart Framing Engine',
+        'tech.framing.desc': 'Timeout mode flushes complete packets after silence, optimized for AT command responses. Streaming mode forwards instantly, ideal for passthrough. Switch freely based on your debugging scenario.',
+        'tech.guard.title': 'Triple-Layer Exception Guard',
+        'tech.guard.desc': 'Global unhandled exception capture at three levels: UI thread, background Tasks, and AppDomain. Serial/Network I/O with timeout protection. Dispose pattern ensures proper resource cleanup.',
+        'section.download': 'Download Now',
+        'download.hint': 'Requires .NET 10 Desktop Runtime. Download the exe and run directly.',
+        'download.btn': 'Download CommMate.exe v{version}',
+        'download.win': 'Windows 10/11',
+        'download.arch': '64-bit',
+        'download.dotnet': 'Requires .NET 10 Runtime',
+        'download.dotnet.link': 'Download .NET Runtime →',
+        'download.free': 'Completely Free',
+        'section.changelog': 'Changelog',
+        'changelog.sub': 'Getting better with every update',
+        'changelog.latest': 'Latest',
+        'changelog.v2.title': "What's New in v1.0.2",
+        'changelog.v2.i0': 'Adaptive terminal window: rows/columns calculated dynamically from window size and font metrics, no longer fixed at 80×24',
+        'changelog.v2.i1': 'Sticky bottom: auto-scroll pauses when scrolling up, resumes when returning to bottom — convenient for reviewing history',
+        'changelog.v2.i2': 'Terminal log export: one-click export of visible terminal text to .txt/.log files',
+        'changelog.v2.i3': 'Theme-aware terminal colors: text and background contrast automatically adjusted for light/dark themes',
+        'changelog.v2.i4': 'Added CommMate Cloud link in About window (www.commmate.cn)',
+        'changelog.v2.i5': 'Fixed low terminal text contrast, missing button borders, and font clipping in light theme',
+        'changelog.v2.i6': 'Improved terminal rendering latency: processes data immediately when idle for faster keystroke response',
+        'changelog.v2.i7': 'Removed local echo — terminal input now relies entirely on remote device echo',
+        'changelog.v1.title': "What's New in v1.0.1",
+        'changelog.v1.i0': 'All-new AT command script engine: custom DSL supporting SEND / EXPECT / WAIT / SET variables / IF GOTO / REPEAT WHILE / ASSERT / LOG',
+        'changelog.v1.i1': 'Script tree browser: manage .cmds script files by brand/model hierarchy with new, edit, save, and delete',
+        'changelog.v1.i2': 'Script import/export: import .cmds files from external sources and export to any directory',
+        'changelog.v1.i3': 'Online script library: one-click access to GitHub script repository for community-shared AT test scripts',
+        'changelog.v1.i4': 'Fixed hex parsing offset error when skipping 0x prefix',
+        'changelog.v1.i5': 'Added HexHelper.BytesToHexString method',
+        'section.faq': 'FAQ',
+        'faq.q1': 'Do I need to install .NET Runtime?',
+        'faq.a1': 'CommMate requires .NET 10 Desktop Runtime to run. Please visit <a href="https://dotnet.microsoft.com/en-us/download/dotnet/10.0" class="text-brand-600 underline" target="_blank" rel="noopener">Microsoft\'s official site</a> to download and install it. Supports Windows 10/11 64-bit systems.',
+        'faq.q2': 'How is CommMate different from other serial tools?',
+        'faq.a2': 'It combines serial communication, TCP/UDP networking, VT100 terminal emulation, and offline cheat sheets in one tool. Clean MVVM architecture, no ads, no bundled software.',
+        'faq.q3': 'Does it support Windows 7?',
+        'faq.a3': 'No. CommMate is built on .NET 10 and only supports Windows 10 version 1809 and above, 64-bit only.',
+        'faq.q4': 'Does it support macOS or Linux?',
+        'faq.a4': 'Currently Windows only. CommMate uses the WPF framework, which is a Windows-native UI technology. Cross-platform support is not planned at this time.',
+        'faq.q5': 'Is it free? Are there ads?',
+        'faq.a5': 'Completely free — no ads, no popups, no bundled software. Feel free to provide feedback through official channels if you have any issues.',
+        'section.discuss': 'Community',
+        'discuss.title': 'Questions or Suggestions? Let\'s Talk',
+        'discuss.desc': 'If you have questions, want new features, or want to connect with other embedded developers, you\'re welcome to join GitHub Discussions.',
+        'discuss.btn': 'Go to GitHub Discussions',
+        'footer.features': 'Features',
+        'footer.tech': 'Tech',
+        'footer.download': 'Download',
+        'footer.changelog': 'Changelog',
+        'footer.discuss': 'Discuss',
+        'footer.privacy': 'Privacy',
+        'footer.copyright': '© 2026 CommMate. All rights reserved.',
+      }
+    };
+
+    function getLang() {
+      try {
+        const saved = localStorage.getItem('commmate-lang');
+        if (saved) return saved;
+        const nav = navigator.language || navigator.userLanguage || '';
+        return nav.startsWith('zh') ? 'zh' : 'en';
+      } catch(e) { return 'zh'; }
+    }
+    function setLang(lang) {
+      try { localStorage.setItem('commmate-lang', lang); } catch(e) {}
+      applyLanguage(lang);
+    }
+
+    function applyLanguage(lang) {
+      const dict = I18N[lang] || I18N.zh;
+      document.getElementById('html-root').setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      // Text elements with data-i18n
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key] != null) el.textContent = dict[key];
+      });
+
+      // HTML elements with data-i18n-html (for rich content like FAQ answers)
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (dict[key] != null) el.innerHTML = dict[key];
+      });
+
+      // ARIA attributes (e.g. aria-label)
+      document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        const key = el.getAttribute('data-i18n-aria');
+        if (dict[key] != null) el.setAttribute('aria-label', dict[key]);
+      });
+
+      // Meta tags
+      document.title = dict['page.title'] || document.title;
+      const metaDesc = document.getElementById('meta-desc');
+      if (metaDesc) metaDesc.setAttribute('content', dict['meta.desc'] || metaDesc.getAttribute('content'));
+
+      // Language switcher buttons
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+      });
+
+      // Refresh version-dependent texts
+      loadVersionInfo();
+    }
+  </script>
 </head>
 <body class="bg-white text-gray-900 font-sans antialiased">
 
@@ -84,19 +375,24 @@
         <span class="font-bold text-lg">CommMate</span>
       </a>
       <div class="hidden md:flex items-center gap-8 text-sm text-gray-600">
-        <a href="#features" class="hover:text-gray-900 transition">特性</a>
-        <a href="#tech" class="hover:text-gray-900 transition">技术亮点</a>
-        <a href="#download" class="hover:text-gray-900 transition">下载</a>
-        <a href="#changelog" class="hover:text-gray-900 transition">更新日志</a>
-        <a href="#discussions" class="hover:text-gray-900 transition">讨论</a>
+        <a href="#features" class="hover:text-gray-900 transition" data-i18n="nav.features">特性</a>
+        <a href="#tech" class="hover:text-gray-900 transition" data-i18n="nav.tech">技术亮点</a>
+        <a href="#download" class="hover:text-gray-900 transition" data-i18n="nav.download">下载</a>
+        <a href="#changelog" class="hover:text-gray-900 transition" data-i18n="nav.changelog">更新日志</a>
+        <a href="#discussions" class="hover:text-gray-900 transition" data-i18n="nav.discuss">讨论</a>
       </div>
       <div class="flex items-center gap-4">
+        <!-- Language Switcher -->
+        <div class="hidden sm:flex items-center gap-1">
+          <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中</button>
+          <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+        </div>
         <a href="https://github.com/Jun-323/CommMate" target="_blank" rel="noopener" class="hidden sm:flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
           GitHub
         </a>
         <!-- Mobile menu button -->
-        <button id="mobile-menu-btn" class="md:hidden flex items-center justify-center w-9 h-9 rounded-lg hover:bg-gray-100 transition" aria-label="打开菜单">
+        <button id="mobile-menu-btn" class="md:hidden flex items-center justify-center w-9 h-9 rounded-lg hover:bg-gray-100 transition" aria-label="打开菜单" data-i18n-aria="nav.menu">
           <svg id="menu-icon" class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
@@ -109,11 +405,16 @@
     <!-- Mobile menu -->
     <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-100">
       <div class="px-6 py-4 space-y-1">
-        <a href="#features" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">特性</a>
-        <a href="#tech" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">技术亮点</a>
-        <a href="#download" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">下载</a>
-        <a href="#changelog" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">更新日志</a>
-        <a href="#discussions" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">讨论</a>
+        <a href="#features" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.features">特性</a>
+        <a href="#tech" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.tech">技术亮点</a>
+        <a href="#download" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.download">下载</a>
+        <a href="#changelog" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.changelog">更新日志</a>
+        <a href="#discussions" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.discuss">讨论</a>
+        <!-- Mobile lang switcher -->
+        <div class="flex items-center gap-2 pt-2">
+          <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中</button>
+          <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+        </div>
         <a href="https://github.com/Jun-323/CommMate" target="_blank" rel="noopener" class="flex items-center gap-2 py-2.5 text-sm text-gray-700 hover:text-brand-600 transition">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
           GitHub
@@ -133,13 +434,13 @@
       <div class="text-center max-w-3xl mx-auto">
         <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-1.5 text-sm text-brand-300 mb-8">
           <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
-          <span id="hero-badge-text">v1.0.2</span>
+          <span id="hero-badge-text" data-i18n="hero.badge">v1.0.2</span>
         </div>
         <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">
-          串口 & 网络调试<br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400">就该这么简单</span>
+          <span data-i18n="hero.h1a">串口 & 网络调试</span><br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400" data-i18n="hero.h1b">就该这么简单</span>
         </h1>
-        <p class="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed">
+        <p class="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed" data-i18n="hero.desc">
           CommMate 是面向嵌入式开发者的五合一调试工具——串口通信、TCP/UDP 网络、VT100 终端仿真、AT 指令脚本引擎、离线速查手册一站式搞定，告别在多个工具之间切换。
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -148,15 +449,15 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
-            免费下载 Windows 版
+            <span data-i18n="hero.download">免费下载 Windows 版</span>
           </a>
           <a href="https://github.com/Jun-323/CommMate" target="_blank" rel="noopener"
              class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-medium px-6 py-3.5 rounded-xl text-base transition border border-white/20">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-            查看 GitHub
+            <span data-i18n="hero.github">查看 GitHub</span>
           </a>
         </div>
-        <p class="mt-4 text-sm text-gray-400" id="version-info">v1.0.2 · Windows 10+ · 需安装 .NET 10 Runtime</p>
+        <p class="mt-4 text-sm text-gray-400" id="version-info" data-i18n="hero.version.info">v1.0.2 · Windows 10+ · 需安装 .NET 10 Runtime</p>
       </div>
 
       <!-- Mockup -->
@@ -171,11 +472,11 @@
           </div>
           <!-- Tab bar -->
           <div class="flex items-center gap-0 border-b border-white/10">
-            <span class="tab-active px-4 py-2 text-xs font-medium font-mono">串口</span>
-            <span class="px-4 py-2 text-xs text-gray-500 font-mono">网络</span>
-            <span class="px-4 py-2 text-xs text-gray-500 font-mono">终端</span>
-            <span class="px-4 py-2 text-xs text-gray-500 font-mono">脚本</span>
-            <span class="px-4 py-2 text-xs text-gray-500 font-mono">速查</span>
+            <span class="tab-active px-4 py-2 text-xs font-medium font-mono" data-i18n="mockup.serial">串口</span>
+            <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.network">网络</span>
+            <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.terminal">终端</span>
+            <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.script">脚本</span>
+            <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.ref">速查</span>
           </div>
           <div class="p-6 md:p-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -183,7 +484,7 @@
               <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                 <div class="flex items-center gap-2 mb-3">
                   <div class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></div>
-                  <span class="text-xs text-green-400 font-medium">串口已连接</span>
+                  <span class="text-xs text-green-400 font-medium" data-i18n="mockup.serial.connected">串口已连接</span>
                   <span class="text-xs text-gray-500 ml-auto font-mono">COM3 115200</span>
                 </div>
                 <div class="space-y-1 font-mono text-xs">
@@ -194,7 +495,6 @@
                   <div class="text-green-400/80">→ AT+CCLK?</div>
                   <div class="text-blue-400/80">← +CCLK: "26/06/17,09:00+32"</div>
                 </div>
-                <!-- Quick commands hint -->
                 <div class="mt-3 flex flex-wrap gap-1">
                   <span class="text-[10px] px-1.5 py-0.5 bg-brand-500/20 text-brand-300 rounded font-mono">AT+CGMI</span>
                   <span class="text-[10px] px-1.5 py-0.5 bg-brand-500/20 text-brand-300 rounded font-mono">AT+CSQ</span>
@@ -205,17 +505,17 @@
               <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                 <div class="flex items-center gap-2 mb-3">
                   <div class="w-2 h-2 bg-pink-400 rounded-full pulse-dot"></div>
-                  <span class="text-xs text-pink-400 font-medium">AT 指令脚本</span>
-                  <span class="text-xs text-gray-500 ml-auto font-mono">▶ 运行中</span>
+                  <span class="text-xs text-pink-400 font-medium" data-i18n="mockup.script.title">AT 指令脚本</span>
+                  <span class="text-xs text-gray-500 ml-auto font-mono" data-i18n="mockup.script.running">▶ 运行中</span>
                 </div>
                 <div class="font-mono text-xs leading-relaxed">
-                  <div class="text-gray-500"># EC801E 基础 AT 测试</div>
+                  <div class="text-gray-500" data-i18n="mockup.script.comment"># EC801E 基础 AT 测试</div>
                   <div class="text-brand-300">SEND AT</div>
                   <div class="text-brand-300">EXPECT "OK" IN 3000</div>
                   <div class="text-brand-300">IF TIMEOUT GOTO fail</div>
                   <div class="text-brand-300">SEND AT+CSQ</div>
                   <div class="text-brand-300">EXPECT "+CSQ:\s*(\d+)" IN 3000 → csq</div>
-                  <div class="text-yellow-400/80">[LOG] 信号值: 23</div>
+                  <div class="text-yellow-400/80" data-i18n="mockup.script.log">[LOG] 信号值: 23</div>
                   <div class="text-brand-300">SEND AT+CREG?</div>
                 </div>
               </div>
@@ -223,7 +523,7 @@
               <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                 <div class="flex items-center gap-2 mb-3">
                   <div class="w-2 h-2 bg-purple-400 rounded-full pulse-dot"></div>
-                  <span class="text-xs text-purple-400 font-medium">VT100 终端</span>
+                  <span class="text-xs text-purple-400 font-medium" data-i18n="mockup.terminal.title">VT100 终端</span>
                   <span class="text-xs text-gray-500 ml-auto font-mono">COM5 115200</span>
                 </div>
                 <div class="font-mono text-xs leading-relaxed">
@@ -240,7 +540,7 @@
               <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                 <div class="flex items-center gap-2 mb-3">
                   <div class="w-2 h-2 bg-amber-400 rounded-full pulse-dot"></div>
-                  <span class="text-xs text-amber-400 font-medium">TCP Client</span>
+                  <span class="text-xs text-amber-400 font-medium" data-i18n="mockup.network.client">TCP Client</span>
                   <span class="text-xs text-gray-500 ml-auto font-mono">192.168.1.100:8080</span>
                 </div>
                 <div class="space-y-1 font-mono text-xs">
@@ -263,108 +563,99 @@
   <section id="features" class="py-20 md:py-28 bg-gray-50">
     <div class="max-w-6xl mx-auto px-6">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">为嵌入式开发者而生</h2>
-        <p class="text-gray-500 text-lg max-w-2xl mx-auto">串口、网络、终端、脚本、速查——五合一，一个工具全部搞定</p>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" data-i18n="section.features">为嵌入式开发者而生</h2>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto" data-i18n="section.features.sub">串口、网络、终端、脚本、速查——五合一，一个工具全部搞定</p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-        <!-- Feature: Serial -->
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
           <div class="w-12 h-12 bg-brand-50 rounded-xl flex items-center justify-center mb-5">
             <svg class="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
           </div>
-          <h3 class="font-semibold text-lg mb-2">串口调试</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">支持全部标准串口参数配置，HEX / ASCII 双模式收发。超时帧与流模式两种分帧策略，适配 AT 指令与透传场景。实时热插拔检测，插拔即刷新端口列表。</p>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.serial.title">串口调试</h3>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.serial.desc">支持全部标准串口参数配置，HEX / ASCII 双模式收发。超时帧与流模式两种分帧策略，适配 AT 指令与透传场景。实时热插拔检测，插拔即刷新端口列表。</p>
         </div>
 
-        <!-- Feature: Network -->
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
           <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-5">
             <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
             </svg>
           </div>
-          <h3 class="font-semibold text-lg mb-2">TCP / UDP 网络</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">TCP Client、TCP Server、UDP 三种模式一键切换。TCP 支持多客户端连接管理，UDP 支持广播收发，提供 5 秒超时保护与后台任务自动清理。</p>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.network.title">TCP / UDP 网络</h3>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.network.desc">TCP Client、TCP Server、UDP 三种模式一键切换。TCP 支持多客户端连接管理，UDP 支持广播收发，提供 5 秒超时保护与后台任务自动清理。</p>
         </div>
 
-        <!-- Feature: Terminal -->
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
           <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-5">
             <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
           </div>
-          <h3 class="font-semibold text-lg mb-2">VT100 终端仿真</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">完整 VT100 转义序列解析引擎，支持光标移动、清屏、颜色/样式属性。自适应窗口尺寸，亮暗主题配色跟随，粘性滚动保留历史查看，一键导出日志文本。</p>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.terminal.title">VT100 终端仿真</h3>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.terminal.desc">完整 VT100 转义序列解析引擎，支持光标移动、清屏、颜色/样式属性。自适应窗口尺寸，亮暗主题配色跟随，粘性滚动保留历史查看，一键导出日志文本。</p>
         </div>
 
-        <!-- Feature: Script Engine -->
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
           <div class="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center mb-5">
             <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
             </svg>
           </div>
-          <h3 class="font-semibold text-lg mb-2">AT 指令脚本引擎</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">自定义 DSL 语法，支持 SEND / EXPECT / WAIT / SET 变量 / IF GOTO 控制流 / REPEAT WHILE 循环。脚本按品牌型号管理，内置编辑器，支持导入导出 .cmds 文件，在线脚本库持续更新。</p>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.script.title">AT 指令脚本引擎</h3>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.script.desc">自定义 DSL 语法，支持 SEND / EXPECT / WAIT / SET 变量 / IF GOTO 控制流 / REPEAT WHILE 循环。脚本按品牌型号管理，内置编辑器，支持导入导出 .cmds 文件，在线脚本库持续更新。</p>
         </div>
 
-        <!-- Feature: Quick Reference -->
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
           <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-5">
             <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
             </svg>
           </div>
-          <h3 class="font-semibold text-lg mb-2">离线速查表</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">内置 5 类离线速查手册：ASCII 码表、Git 命令、Linux 命令、Android 调试、WiFi 调试——500+ 条命令，无需联网，选中即复制。</p>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.ref.title">离线速查表</h3>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.ref.desc">内置 5 类离线速查手册：ASCII 码表、Git 命令、Linux 命令、Android 调试、WiFi 调试——500+ 条命令，无需联网，选中即复制。</p>
         </div>
 
-        <!-- Feature: Log -->
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
           <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-5">
             <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
           </div>
-          <h3 class="font-semibold text-lg mb-2">日志记录</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">完整收发日志带毫秒级时间戳，HEX 与 ASCII 双栏对照显示，支持复制与导出为文本文件。发送字节数实时统计，方便问题回溯。</p>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.log.title">日志记录</h3>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.log.desc">完整收发日志带毫秒级时间戳，HEX 与 ASCII 双栏对照显示，支持复制与导出为文本文件。发送字节数实时统计，方便问题回溯。</p>
         </div>
 
-        <!-- Feature: i18n & Theme -->
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
           <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mb-5">
             <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
             </svg>
           </div>
-          <h3 class="font-semibold text-lg mb-2">中英双语 & 主题切换</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">完整中英文界面，自定义 MarkupExtension 实现运行时语言切换。亮色 / 暗色双主题，DynamicResource 驱动即时生效，无闪烁。</p>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.i18n.title">中英双语 & 主题切换</h3>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.i18n.desc">完整中英文界面，自定义 MarkupExtension 实现运行时语言切换。亮色 / 暗色双主题，DynamicResource 驱动即时生效，无闪烁。</p>
         </div>
 
-        <!-- Feature: Multi-tab -->
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
           <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center mb-5">
             <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
             </svg>
           </div>
-          <h3 class="font-semibold text-lg mb-2">多面板并行</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">串口、网络、终端、脚本、速查五个功能面板独立运行互不干扰。全局端口互斥机制防止同一端口被多个面板同时占用，安全可靠。</p>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.multitab.title">多面板并行</h3>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.multitab.desc">串口、网络、终端、脚本、速查五个功能面板独立运行互不干扰。全局端口互斥机制防止同一端口被多个面板同时占用，安全可靠。</p>
         </div>
 
-        <!-- Feature: Free -->
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
           <div class="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center mb-5">
             <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
             </svg>
           </div>
-          <h3 class="font-semibold text-lg mb-2">完全免费</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">完全免费，无广告无弹窗无捆绑。.NET 10 WPF 原生开发，启动快内存低，专注工具本身。</p>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.free.title">完全免费</h3>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.free.desc">完全免费，无广告无弹窗无捆绑。.NET 10 WPF 原生开发，启动快内存低，专注工具本身。</p>
         </div>
 
       </div>
@@ -375,8 +666,8 @@
   <section id="tech" class="py-20 md:py-28">
     <div class="max-w-6xl mx-auto px-6">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">技术亮点</h2>
-        <p class="text-gray-500 text-lg max-w-2xl mx-auto">不仅功能全面，代码本身也是一份 WPF MVVM 的实践参考</p>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" data-i18n="section.tech">技术亮点</h2>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto" data-i18n="section.tech.sub">不仅功能全面，代码本身也是一份 WPF MVVM 的实践参考</p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
 
@@ -385,8 +676,8 @@
             <span class="font-mono font-bold text-sm text-brand-700">MV</span>
           </div>
           <div>
-            <h4 class="font-semibold mb-1.5">严格 MVVM 架构</h4>
-            <p class="text-sm text-gray-500 leading-relaxed">基于 CommunityToolkit.Mvvm 源生成器，零样板代码。Models / Services / ViewModels / Views 四层分离，职责边界清晰。</p>
+            <h4 class="font-semibold mb-1.5" data-i18n="tech.mvvm.title">严格 MVVM 架构</h4>
+            <p class="text-sm text-gray-500 leading-relaxed" data-i18n="tech.mvvm.desc">基于 CommunityToolkit.Mvvm 源生成器，零样板代码。Models / Services / ViewModels / Views 四层分离，职责边界清晰。</p>
           </div>
         </div>
 
@@ -395,8 +686,8 @@
             <span class="font-mono font-bold text-sm text-green-700">⚡</span>
           </div>
           <div>
-            <h4 class="font-semibold mb-1.5">后台线程 Offload</h4>
-            <p class="text-sm text-gray-500 leading-relaxed">HEX / ASCII 转换在数据接收线程完成，BeginInvoke 异步投递 UI 更新，不阻塞接收线程，高频数据场景吞吐量优异。</p>
+            <h4 class="font-semibold mb-1.5" data-i18n="tech.thread.title">后台线程 Offload</h4>
+            <p class="text-sm text-gray-500 leading-relaxed" data-i18n="tech.thread.desc">HEX / ASCII 转换在数据接收线程完成，BeginInvoke 异步投递 UI 更新，不阻塞接收线程，高频数据场景吞吐量优异。</p>
           </div>
         </div>
 
@@ -405,8 +696,8 @@
             <span class="font-mono font-bold text-sm text-purple-700">VT</span>
           </div>
           <div>
-            <h4 class="font-semibold mb-1.5">VT100 终端引擎</h4>
-            <p class="text-sm text-gray-500 leading-relaxed">手写转义序列解析器，支持 SGR 颜色 / 样式、光标定位、清屏。ConcurrentQueue 缓冲 + 空闲即时渲染 / 忙碌 30ms 批处理双模切换，自适应窗口尺寸，主题跟随配色。</p>
+            <h4 class="font-semibold mb-1.5" data-i18n="tech.vt.title">VT100 终端引擎</h4>
+            <p class="text-sm text-gray-500 leading-relaxed" data-i18n="tech.vt.desc">手写转义序列解析器，支持 SGR 颜色 / 样式、光标定位、清屏。ConcurrentQueue 缓冲 + 空闲即时渲染 / 忙碌 30ms 批处理双模切换，自适应窗口尺寸，主题跟随配色。</p>
           </div>
         </div>
 
@@ -415,8 +706,8 @@
             <span class="font-mono font-bold text-sm text-pink-700">DSL</span>
           </div>
           <div>
-            <h4 class="font-semibold mb-1.5">自定义 DSL 脚本引擎</h4>
-            <p class="text-sm text-gray-500 leading-relaxed">手写词法分析器 + 递归下降语法分析器，支持变量、正则匹配、控制流、循环。脚本树文件浏览器 + 文件监控自动刷新 + 在线脚本库。</p>
+            <h4 class="font-semibold mb-1.5" data-i18n="tech.dsl.title">自定义 DSL 脚本引擎</h4>
+            <p class="text-sm text-gray-500 leading-relaxed" data-i18n="tech.dsl.desc">手写词法分析器 + 递归下降语法分析器，支持变量、正则匹配、控制流、循环。脚本树文件浏览器 + 文件监控自动刷新 + 在线脚本库。</p>
           </div>
         </div>
 
@@ -425,8 +716,8 @@
             <span class="font-mono font-bold text-sm text-teal-700">⏱</span>
           </div>
           <div>
-            <h4 class="font-semibold mb-1.5">智能分帧引擎</h4>
-            <p class="text-sm text-gray-500 leading-relaxed">超时模式静默期后整包输出，专为 AT 指令响应优化；流式模式即时转发，适用透传场景。根据调试场景自由切换，精准控制数据边界。</p>
+            <h4 class="font-semibold mb-1.5" data-i18n="tech.framing.title">智能分帧引擎</h4>
+            <p class="text-sm text-gray-500 leading-relaxed" data-i18n="tech.framing.desc">超时模式静默期后整包输出，专为 AT 指令响应优化；流式模式即时转发，适用透传场景。根据调试场景自由切换，精准控制数据边界。</p>
           </div>
         </div>
 
@@ -435,8 +726,8 @@
             <span class="font-mono font-bold text-sm text-amber-700">🛡</span>
           </div>
           <div>
-            <h4 class="font-semibold mb-1.5">三层异常兜底</h4>
-            <p class="text-sm text-gray-500 leading-relaxed">UI 线程、后台 Task、AppDomain 三层未处理异常全局捕获。串口 / 网络 I/O 带超时保护，Dispose 模式确保资源正确释放。</p>
+            <h4 class="font-semibold mb-1.5" data-i18n="tech.guard.title">三层异常兜底</h4>
+            <p class="text-sm text-gray-500 leading-relaxed" data-i18n="tech.guard.desc">UI 线程、后台 Task、AppDomain 三层未处理异常全局捕获。串口 / 网络 I/O 带超时保护，Dispose 模式确保资源正确释放。</p>
           </div>
         </div>
 
@@ -453,45 +744,35 @@
           <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-white rounded-full"></div>
         </div>
         <div class="relative z-10">
-          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">立即下载</h2>
-          <p class="text-brand-200 text-lg mb-8 max-w-xl mx-auto">需先安装 .NET 10 Desktop Runtime。下载 exe 后直接运行。</p>
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4" data-i18n="section.download">立即下载</h2>
+          <p class="text-brand-200 text-lg mb-8 max-w-xl mx-auto" data-i18n="download.hint">需先安装 .NET 10 Desktop Runtime。下载 exe 后直接运行。</p>
           <a href="https://github.com/Jun-323/CommMate/releases/latest/download/CommMate.exe" id="download-btn-main"
              class="inline-flex items-center gap-2 bg-white text-brand-700 font-bold px-10 py-4 rounded-xl text-lg hover:bg-gray-100 transition shadow-xl">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
-            下载 CommMate.exe v1.0.2
+            <span data-i18n="download.btn">下载 CommMate.exe v1.0.2</span>
           </a>
           <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-brand-200">
             <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              Windows 10/11
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="download.win">Windows 10/11</span>
             </span>
             <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              64 位
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="download.arch">64 位</span>
             </span>
             <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              需 .NET 10 Runtime
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="download.dotnet">需 .NET 10 Runtime</span>
             </span>
             <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              <a href="https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0" target="_blank" rel="noopener" class="underline hover:text-white transition">下载 .NET Runtime →</a>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <a href="https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0" target="_blank" rel="noopener" class="underline hover:text-white transition" data-i18n="download.dotnet.link">下载 .NET Runtime →</a>
             </span>
             <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              完全免费
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span data-i18n="download.free">完全免费</span>
             </span>
           </div>
         </div>
@@ -503,8 +784,8 @@
   <section id="changelog" class="py-20 md:py-28">
     <div class="max-w-3xl mx-auto px-6">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">更新日志</h2>
-        <p class="text-gray-500 text-lg">每次更新都在变得更好</p>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" data-i18n="section.changelog">更新日志</h2>
+        <p class="text-gray-500 text-lg" data-i18n="changelog.sub">每次更新都在变得更好</p>
       </div>
       <div class="space-y-8">
         <!-- v1.0.2 -->
@@ -512,42 +793,18 @@
           <div class="flex items-center gap-3 mb-4">
             <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.2</span>
             <span class="text-gray-400 text-sm">2026-07-13</span>
-            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md">最新</span>
+            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
           </div>
-          <h3 class="font-semibold text-lg mb-3">v1.0.2 更新</h3>
+          <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v2.title">v1.0.2 更新</h3>
           <ul class="space-y-2 text-sm text-gray-600">
-            <li class="flex items-start gap-2">
-              <span class="text-green-500 mt-0.5 font-bold">+</span>
-              终端自适应窗口：行列数根据窗口尺寸和字体大小实时计算，不再固定 80×24
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-green-500 mt-0.5 font-bold">+</span>
-              终端粘性底部：向上翻阅时暂停自动滚动，回到底部自动恢复，方便查看历史输出
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-green-500 mt-0.5 font-bold">+</span>
-              终端保存日志：一键导出终端可见文本到 .txt/.log 文件
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-green-500 mt-0.5 font-bold">+</span>
-              终端配色跟随主题：浅色/深色主题下自动调整文字与背景对比度
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-green-500 mt-0.5 font-bold">+</span>
-              关于窗口新增 CommMate Cloud 链接（www.commmate.cn）
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-amber-500 mt-0.5">*</span>
-              修复浅色主题下终端文本对比度低、按钮边框缺失、字体裁切等问题
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-amber-500 mt-0.5">*</span>
-              优化终端渲染延迟：空闲时立即处理数据，提升按键响应速度
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-amber-500 mt-0.5">*</span>
-              移除本地回显，终端输入完全依赖远端设备回声
-            </li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v2.i0">终端自适应窗口：行列数根据窗口尺寸和字体大小实时计算，不再固定 80×24</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v2.i1">终端粘性底部：向上翻阅时暂停自动滚动，回到底部自动恢复，方便查看历史输出</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v2.i2">终端保存日志：一键导出终端可见文本到 .txt/.log 文件</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v2.i3">终端配色跟随主题：浅色/深色主题下自动调整文字与背景对比度</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v2.i4">关于窗口新增 CommMate Cloud 链接（www.commmate.cn）</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v2.i5">修复浅色主题下终端文本对比度低、按钮边框缺失、字体裁切等问题</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v2.i6">优化终端渲染延迟：空闲时立即处理数据，提升按键响应速度</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v2.i7">移除本地回显，终端输入完全依赖远端设备回声</span></li>
           </ul>
         </div>
         <!-- v1.0.1 -->
@@ -556,32 +813,14 @@
             <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.1</span>
             <span class="text-gray-400 text-sm">2026-07-07</span>
           </div>
-          <h3 class="font-semibold text-lg mb-3">v1.0.1 更新</h3>
+          <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v1.title">v1.0.1 更新</h3>
           <ul class="space-y-2 text-sm text-gray-600">
-            <li class="flex items-start gap-2">
-              <span class="text-green-500 mt-0.5 font-bold">+</span>
-              全新 AT 指令脚本引擎：自定义 DSL 语法，支持 SEND / EXPECT / WAIT / SET 变量 / IF GOTO / REPEAT WHILE / ASSERT / LOG
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-green-500 mt-0.5 font-bold">+</span>
-              脚本树浏览器：按品牌/型号层级管理 .cmds 脚本文件，支持新建、编辑、保存、删除
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-green-500 mt-0.5 font-bold">+</span>
-              脚本导入/导出：支持从外部导入 .cmds 文件，导出到任意目录
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-green-500 mt-0.5 font-bold">+</span>
-              在线脚本库：一键跳转 GitHub 脚本仓库，获取社区共享的 AT 测试脚本
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-amber-500 mt-0.5">*</span>
-              修复 Hex 解析中 0x 前缀跳过偏移量错误
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-amber-500 mt-0.5">*</span>
-              新增 HexHelper.BytesToHexString 方法
-            </li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v1.i0">全新 AT 指令脚本引擎：自定义 DSL 语法，支持 SEND / EXPECT / WAIT / SET 变量 / IF GOTO / REPEAT WHILE / ASSERT / LOG</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v1.i1">脚本树浏览器：按品牌/型号层级管理 .cmds 脚本文件，支持新建、编辑、保存、删除</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v1.i2">脚本导入/导出：支持从外部导入 .cmds 文件，导出到任意目录</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v1.i3">在线脚本库：一键跳转 GitHub 脚本仓库，获取社区共享的 AT 测试脚本</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v1.i4">修复 Hex 解析中 0x 前缀跳过偏移量错误</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v1.i5">新增 HexHelper.BytesToHexString 方法</span></li>
           </ul>
         </div>
       </div>
@@ -592,63 +831,45 @@
   <section class="py-20 md:py-28 bg-gray-50">
     <div class="max-w-3xl mx-auto px-6">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">常见问题</h2>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" data-i18n="section.faq">常见问题</h2>
       </div>
       <div class="space-y-4">
         <details class="bg-white rounded-xl border border-gray-100 group" open>
           <summary class="p-5 font-medium cursor-pointer flex items-center justify-between">
-            需要安装 .NET 运行时吗？
-            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
+            <span data-i18n="faq.q1">需要安装 .NET 运行时吗？</span>
+            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </summary>
-          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed" data-i18n-html="faq.a1">
             CommMate 需要 .NET 10 Desktop Runtime 才能运行。请先前往 <a href="https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0" class="text-brand-600 underline" target="_blank" rel="noopener">微软官网</a> 下载安装，Windows 10/11 64 位系统均支持。
           </div>
         </details>
         <details class="bg-white rounded-xl border border-gray-100 group">
           <summary class="p-5 font-medium cursor-pointer flex items-center justify-between">
-            CommMate 和市面上的串口助手有什么不同？
-            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
+            <span data-i18n="faq.q2">CommMate 和市面上的串口助手有什么不同？</span>
+            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </summary>
-          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
-            集串口通信、TCP/UDP 网络、VT100 终端仿真、离线速查表于一体，无需在多个工具间切换。MVVM 架构清晰，无广告无捆绑。
-          </div>
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed" data-i18n="faq.a2">集串口通信、TCP/UDP 网络、VT100 终端仿真、离线速查表于一体，无需在多个工具间切换。MVVM 架构清晰，无广告无捆绑。</div>
         </details>
         <details class="bg-white rounded-xl border border-gray-100 group">
           <summary class="p-5 font-medium cursor-pointer flex items-center justify-between">
-            支持 Windows 7 吗？
-            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
+            <span data-i18n="faq.q3">支持 Windows 7 吗？</span>
+            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </summary>
-          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
-            不支持。CommMate 基于 .NET 10 构建，仅支持 Windows 10 1809 及以上版本的 64 位系统。
-          </div>
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed" data-i18n="faq.a3">不支持。CommMate 基于 .NET 10 构建，仅支持 Windows 10 1809 及以上版本的 64 位系统。</div>
         </details>
         <details class="bg-white rounded-xl border border-gray-100 group">
           <summary class="p-5 font-medium cursor-pointer flex items-center justify-between">
-            支持 macOS 或 Linux 吗？
-            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
+            <span data-i18n="faq.q4">支持 macOS 或 Linux 吗？</span>
+            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </summary>
-          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
-            目前仅支持 Windows。CommMate 使用 WPF 框架，这是 Windows 原生 UI 技术。跨平台版本暂无计划。
-          </div>
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed" data-i18n="faq.a4">目前仅支持 Windows。CommMate 使用 WPF 框架，这是 Windows 原生 UI 技术。跨平台版本暂无计划。</div>
         </details>
         <details class="bg-white rounded-xl border border-gray-100 group">
           <summary class="p-5 font-medium cursor-pointer flex items-center justify-between">
-            收费吗？有广告吗？
-            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
+            <span data-i18n="faq.q5">收费吗？有广告吗？</span>
+            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </summary>
-          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
-            完全免费，无广告、无弹窗、无捆绑。如有问题欢迎通过官方渠道反馈。
-          </div>
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed" data-i18n="faq.a5">完全免费，无广告、无弹窗、无捆绑。如有问题欢迎通过官方渠道反馈。</div>
         </details>
       </div>
     </div>
@@ -662,16 +883,16 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
           </svg>
-          交流讨论
+          <span data-i18n="section.discuss">交流讨论</span>
         </div>
-        <h2 class="text-2xl md:text-3xl font-bold mb-4">有问题或建议？来聊聊</h2>
-        <p class="text-gray-500 mb-8 leading-relaxed">
+        <h2 class="text-2xl md:text-3xl font-bold mb-4" data-i18n="discuss.title">有问题或建议？来聊聊</h2>
+        <p class="text-gray-500 mb-8 leading-relaxed" data-i18n="discuss.desc">
           使用中有疑问、想要新功能、或者想和其他嵌入式开发者交流，都欢迎前往 GitHub Discussions。
         </p>
         <a href="https://github.com/Jun-323/CommMate/discussions" target="_blank" rel="noopener"
            class="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold px-8 py-3.5 rounded-xl text-base transition">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-          前往 GitHub Discussions
+          <span data-i18n="discuss.btn">前往 GitHub Discussions</span>
         </a>
       </div>
     </div>
@@ -686,15 +907,15 @@
           <span class="font-semibold text-white">CommMate</span>
         </div>
         <div class="flex items-center gap-6 text-sm">
-          <a href="#features" class="hover:text-white transition">特性</a>
-          <a href="#tech" class="hover:text-white transition">技术亮点</a>
-          <a href="#download" class="hover:text-white transition">下载</a>
-          <a href="#changelog" class="hover:text-white transition">更新日志</a>
-          <a href="#discussions" class="hover:text-white transition">讨论区</a>
-          <a href="privacy.html" class="hover:text-white transition">隐私策略</a>
+          <a href="#features" class="hover:text-white transition" data-i18n="footer.features">特性</a>
+          <a href="#tech" class="hover:text-white transition" data-i18n="footer.tech">技术亮点</a>
+          <a href="#download" class="hover:text-white transition" data-i18n="footer.download">下载</a>
+          <a href="#changelog" class="hover:text-white transition" data-i18n="footer.changelog">更新日志</a>
+          <a href="#discussions" class="hover:text-white transition" data-i18n="footer.discuss">讨论区</a>
+          <a href="privacy.html" class="hover:text-white transition" data-i18n="footer.privacy">隐私策略</a>
           <a href="https://github.com/Jun-323/CommMate" target="_blank" rel="noopener" class="hover:text-white transition">GitHub</a>
         </div>
-        <p class="text-sm">&copy; 2026 CommMate. All rights reserved.</p>
+        <p class="text-sm" data-i18n="footer.copyright">&copy; 2026 CommMate. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -721,32 +942,37 @@
       });
     }
 
+    let _versionFetchId = 0;
+
     async function loadVersionInfo() {
+      const lang = getLang();
+      const dict = I18N[lang] || I18N.zh;
+      const fetchId = ++_versionFetchId;
       try {
         const resp = await fetch('https://api.github.com/repos/Jun-323/CommMate/releases/latest');
-        if (!resp.ok) return;
+        if (!resp.ok) throw new Error('API unavailable');
         const data = await resp.json();
         const fullVersion = data.tag_name || '';
         const version = fullVersion.replace(/^v/, '');
-        if (!version) return;
+        if (!version) throw new Error('no version');
 
-        // Hero badge
+        // Guard: discard stale responses from rapid language switching
+        if (fetchId !== _versionFetchId) return;
+
         const badge = document.getElementById('hero-badge-text');
-        if (badge) badge.textContent = `v${version} 正式发布`;
+        if (badge) badge.textContent = dict['hero.badge'].replace('{version}', version);
 
-        // Version info line
         const verEl = document.getElementById('version-info');
-        if (verEl) verEl.textContent = `v${version} · Windows 10+ · 需安装 .NET 10 Runtime`;
+        if (verEl) verEl.textContent = dict['hero.version.info'].replace('{version}', version);
 
-        // Mockup title bar
         const mockup = document.getElementById('mockup-version');
         if (mockup) mockup.textContent = `CommMate v${version}`;
 
-        // Download buttons — use the actual asset download URL from release
         const downloadUrl = (data.assets && data.assets[0] && data.assets[0].browser_download_url) || null;
         const dlBtnMain = document.getElementById('download-btn-main');
         if (dlBtnMain) {
-          dlBtnMain.lastChild.textContent = ` 下载 CommMate.exe v${version}`;
+          const span = dlBtnMain.querySelector('span[data-i18n]');
+          if (span) span.textContent = dict['download.btn'].replace('{version}', version);
           if (downloadUrl) dlBtnMain.href = downloadUrl;
         }
         const dlBtnHero = document.getElementById('download-btn-hero');
@@ -754,10 +980,25 @@
           dlBtnHero.href = downloadUrl;
         }
       } catch (e) {
-        // Silently fall back to hardcoded defaults
+        // Guard: discard stale errors too
+        if (fetchId !== _versionFetchId) return;
+        // Fallback: replace {version} with hardcoded default so users never see the literal placeholder
+        const fallbackVersion = '1.0.2';
+        const badge = document.getElementById('hero-badge-text');
+        if (badge) badge.textContent = dict['hero.badge'].replace('{version}', fallbackVersion);
+        const verEl = document.getElementById('version-info');
+        if (verEl) verEl.textContent = dict['hero.version.info'].replace('{version}', fallbackVersion);
+        const dlBtnMain = document.getElementById('download-btn-main');
+        if (dlBtnMain) {
+          const span = dlBtnMain.querySelector('span[data-i18n]');
+          if (span) span.textContent = dict['download.btn'].replace('{version}', fallbackVersion);
+        }
       }
     }
-    loadVersionInfo();
+
+    // Apply saved language on page load
+    applyLanguage(getLang());
+    // Load version info (already called by applyLanguage, but also fire on load)
   </script>
 
   <!-- Fireworks -->
@@ -800,7 +1041,7 @@
         }
         update() {
           this.x += this.vx;
-          this.vy += 0.05; // gravity
+          this.vy += 0.05;
           this.y += this.vy;
           this.vx *= 0.99;
           this.vy *= 0.99;
@@ -848,7 +1089,6 @@
           }
         }
         draw(ctx) {
-          // Trail
           for (let i = 0; i < this.trail.length; i++) {
             const t = this.trail[i];
             ctx.save();
@@ -862,7 +1102,6 @@
             ctx.restore();
             t.life -= 0.08;
           }
-          // Head
           ctx.save();
           ctx.fillStyle = '#fff';
           ctx.shadowColor = this.color;
@@ -880,23 +1119,17 @@
 
       function animate() {
         ctx.clearRect(0, 0, width, height);
-
-        // Launch new rockets
         launchTimer++;
         const interval = random(LAUNCH_INTERVAL_MIN, LAUNCH_INTERVAL_MAX);
         if (launchTimer >= interval && rockets.length < 4) {
           launchTimer = 0;
           rockets.push(new Rocket());
         }
-
-        // Update & draw rockets
         for (let i = rockets.length - 1; i >= 0; i--) {
           rockets[i].update();
           rockets[i].draw(ctx);
           if (!rockets[i].alive) rockets.splice(i, 1);
         }
-
-        // Update & draw particles
         for (let i = particles.length - 1; i >= 0; i--) {
           particles[i].update();
           if (particles[i].life <= 0) {
@@ -905,16 +1138,12 @@
             particles[i].draw(ctx);
           }
         }
-
         requestAnimationFrame(animate);
       }
 
-      // Use IntersectionObserver to pause when off-screen
       const hero = canvas.parentElement;
       const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          resize();
-        }
+        if (entries[0].isIntersecting) resize();
       }, { threshold: 0 });
       observer.observe(hero);
 
