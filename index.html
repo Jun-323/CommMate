@@ -133,7 +133,7 @@
       <div class="text-center max-w-3xl mx-auto">
         <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-1.5 text-sm text-brand-300 mb-8">
           <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
-          <span id="hero-badge-text">v1.0.1</span>
+          <span id="hero-badge-text">v1.0.2</span>
         </div>
         <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">
           串口 & 网络调试<br>
@@ -156,7 +156,7 @@
             查看 GitHub
           </a>
         </div>
-        <p class="mt-4 text-sm text-gray-400" id="version-info">v1.0.1 · Windows 10+ · 需安装 .NET 10 Runtime</p>
+        <p class="mt-4 text-sm text-gray-400" id="version-info">v1.0.2 · Windows 10+ · 需安装 .NET 10 Runtime</p>
       </div>
 
       <!-- Mockup -->
@@ -167,7 +167,7 @@
             <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
             <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
             <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
-            <span class="ml-3 text-xs text-gray-500 font-mono" id="mockup-version">CommMate v1.0.1</span>
+            <span class="ml-3 text-xs text-gray-500 font-mono" id="mockup-version">CommMate v1.0.2</span>
           </div>
           <!-- Tab bar -->
           <div class="flex items-center gap-0 border-b border-white/10">
@@ -298,7 +298,7 @@
             </svg>
           </div>
           <h3 class="font-semibold text-lg mb-2">VT100 终端仿真</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">完整 VT100 转义序列解析引擎，支持光标移动、清屏、颜色 / 样式属性。WPF RichTextBox 渲染，30ms 批量合并刷新，流畅不卡顿。</p>
+          <p class="text-gray-500 text-sm leading-relaxed">完整 VT100 转义序列解析引擎，支持光标移动、清屏、颜色/样式属性。自适应窗口尺寸，亮暗主题配色跟随，粘性滚动保留历史查看，一键导出日志文本。</p>
         </div>
 
         <!-- Feature: Script Engine -->
@@ -406,7 +406,7 @@
           </div>
           <div>
             <h4 class="font-semibold mb-1.5">VT100 终端引擎</h4>
-            <p class="text-sm text-gray-500 leading-relaxed">手写转义序列解析器，支持 SGR 颜色 / 样式、光标定位、清屏擦除。ConcurrentQueue 缓冲 + 30ms 定时批渲染，流畅不丢帧。</p>
+            <p class="text-sm text-gray-500 leading-relaxed">手写转义序列解析器，支持 SGR 颜色 / 样式、光标定位、清屏。ConcurrentQueue 缓冲 + 空闲即时渲染 / 忙碌 30ms 批处理双模切换，自适应窗口尺寸，主题跟随配色。</p>
           </div>
         </div>
 
@@ -460,7 +460,7 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
-            下载 CommMate.exe v1.0.1
+            下载 CommMate.exe v1.0.2
           </a>
           <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-brand-200">
             <span class="flex items-center gap-1">
@@ -507,12 +507,54 @@
         <p class="text-gray-500 text-lg">每次更新都在变得更好</p>
       </div>
       <div class="space-y-8">
+        <!-- v1.0.2 -->
+        <div class="bg-white rounded-2xl p-7 border border-gray-100">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.2</span>
+            <span class="text-gray-400 text-sm">2026-07-13</span>
+            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md">最新</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-3">v1.0.2 更新</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-0.5 font-bold">+</span>
+              终端自适应窗口：行列数根据窗口尺寸和字体大小实时计算，不再固定 80×24
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-0.5 font-bold">+</span>
+              终端粘性底部：向上翻阅时暂停自动滚动，回到底部自动恢复，方便查看历史输出
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-0.5 font-bold">+</span>
+              终端保存日志：一键导出终端可见文本到 .txt/.log 文件
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-0.5 font-bold">+</span>
+              终端配色跟随主题：浅色/深色主题下自动调整文字与背景对比度
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500 mt-0.5 font-bold">+</span>
+              关于窗口新增 CommMate Cloud 链接（www.commmate.cn）
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-500 mt-0.5">*</span>
+              修复浅色主题下终端文本对比度低、按钮边框缺失、字体裁切等问题
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-500 mt-0.5">*</span>
+              优化终端渲染延迟：空闲时立即处理数据，提升按键响应速度
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-500 mt-0.5">*</span>
+              移除本地回显，终端输入完全依赖远端设备回声
+            </li>
+          </ul>
+        </div>
         <!-- v1.0.1 -->
         <div class="bg-white rounded-2xl p-7 border border-gray-100">
           <div class="flex items-center gap-3 mb-4">
             <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.1</span>
             <span class="text-gray-400 text-sm">2026-07-07</span>
-            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md">最新</span>
           </div>
           <h3 class="font-semibold text-lg mb-3">v1.0.1 更新</h3>
           <ul class="space-y-2 text-sm text-gray-600">

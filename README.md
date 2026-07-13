@@ -25,7 +25,7 @@
 |---|---|
 | **Serial** | Baud 110–921600, 5/6/7/8 data bits, parity, flow control, hex/text TX/RX, quick commands (editable presets), timed auto-send, TX/RX counters, save-to-file |
 | **Network** | TCP Client (optional local bind), TCP Server (multi-client, per-client disconnect), UDP (broadcast, auto reply routing) |
-| **Terminal** | VT100/256-color XTerm over serial, 80×24 buffer, full escape sequences, keyboard forwarding (arrows, F1–F12, Home/End, etc.), local echo |
+| **Terminal** | VT100/256-color XTerm over serial, adaptive buffer (fills window), full escape sequences, keyboard forwarding (arrows, F1–F12, Home/End, Space, etc.), auto-scroll, save-to-file, theme-aware colors |
 | **Script** | Custom DSL engine — SEND/SENDN/HEX, EXPECT (regex with capture groups), WAIT, SET with $var variables & arithmetic, IF/IF OK/IF TIMEOUT/GOTO control flow, REPEAT/WHILE loops, LABEL, LOG, ASSERT, STOP. Script tree browser (brand/model hierarchy), inline editor, import/export .cmds files, online script library |
 | **Reference** | ASCII (128 entries), Git (54 commands / 8 categories), Linux (106 commands / 9 categories), ADB (82 commands / 7 categories), Wi-Fi (78 commands / 8 categories) — all offline, bilingual |
 | **UI** | Bilingual (EN/ZH), light & dark themes, status bar with live clock, config auto-persistence, automatic update check via GitHub Releases |
@@ -37,7 +37,7 @@
 | `Enter` | Send box | Send |
 | `Ctrl+Enter` | Send box | Newline (no send) |
 | `Ctrl+C` | Reference panel | Copy selection |
-| Arrow keys, F1–F12, Home/End, Del, Tab, Esc, Backspace | Terminal | VT100 sequence |
+| Arrow keys, F1–F12, Home/End, Del, Tab, Esc, Backspace, Space | Terminal | VT100 sequence |
 
 ## Requirements
 
@@ -70,7 +70,7 @@ This app does not collect or upload any personal data. See the [Privacy Policy](
 |---|---|
 | **串口** | 波特率 110–921600，5/6/7/8 数据位，校验，流控，Hex/文本收发，快捷命令（可编辑预设），定时发送，收发计数，日志保存 |
 | **网络** | TCP 客户端（可选本地绑定），TCP 服务器（多客户端管理，逐客户端断开），UDP（广播，自动回复路由） |
-| **终端** | 基于串口的 VT100 / 256 色 XTerm，80×24 缓冲区，完整转义序列，键盘转发（方向键、F1–F12 等），本地回显 |
+| **终端** | 基于串口的 VT100 / 256 色 XTerm，自适应窗口尺寸，完整转义序列，键盘转发（方向键、F1–F12、空格等），自动滚动，保存日志，主题跟随配色 |
 | **脚本** | 自定义 DSL 引擎 — SEND/SENDN/HEX 发送，EXPECT 正则匹配（含捕获组），WAIT 延时，SET 变量赋值与运算，IF/IF OK/IF TIMEOUT/GOTO 控制流，REPEAT/WHILE 循环，LABEL 标签，LOG/ASSERT/STOP。脚本树浏览器（品牌/型号层级），内置编辑器，导入导出 .cmds，在线脚本库 |
 | **速查** | ASCII（128 条）、Git（54 条 / 8 类）、Linux（106 条 / 9 类）、ADB（82 条 / 7 类）、Wi-Fi（78 条 / 8 类）— 全离线、双语 |
 | **界面** | 中英双语，亮/暗主题，状态栏实时时钟，配置自动持久化，GitHub Releases 自动更新检测 |
@@ -82,7 +82,7 @@ This app does not collect or upload any personal data. See the [Privacy Policy](
 | `Enter` | 发送框 | 发送 |
 | `Ctrl+Enter` | 发送框 | 换行（不发送） |
 | `Ctrl+C` | 速查面板 | 复制选中 |
-| 方向键、F1–F12、Home/End、Del、Tab、Esc、Backspace | 终端面板 | VT100 序列 |
+| 方向键、F1–F12、Home/End、Del、Tab、Esc、Backspace、空格 | 终端面板 | VT100 序列 |
 
 ## 运行要求
 
