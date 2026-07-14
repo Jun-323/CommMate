@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title id="page-title">CommMate - 串口 &amp; 网络调试助手</title>
-  <meta name="description" id="meta-desc" content="CommMate 是一款面向嵌入式开发者的轻量高效串口与网络调试工具，支持串口通信、TCP/UDP 网络、VT100 终端仿真、AT 快捷指令，基于 .NET 10 WPF 构建。">
+  <meta name="description" id="meta-desc" content="CommMate 是一款面向嵌入式开发者的轻量高效串口与网络调试工具，支持串口通信、TCP/UDP 网络、AT 指令脚本、离线速查手册，基于 .NET 10 WPF 构建。">
   <link rel="icon" type="image/png" href="icon.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -91,7 +91,7 @@
     const I18N = {
       zh: {
         'page.title': 'CommMate - 串口 & 网络调试助手',
-        'meta.desc': 'CommMate 是一款面向嵌入式开发者的轻量高效串口与网络调试工具，支持串口通信、TCP/UDP 网络、VT100 终端仿真、AT 快捷指令，基于 .NET 10 WPF 构建。',
+        'meta.desc': 'CommMate 是一款面向嵌入式开发者的轻量高效串口与网络调试工具，支持串口通信、TCP/UDP 网络、AT 指令脚本、离线速查手册，基于 .NET 10 WPF 构建。',
         'nav.features': '特性',
         'nav.tech': '技术亮点',
         'nav.download': '下载',
@@ -101,7 +101,7 @@
         'hero.badge': 'v{version} 正式发布',
         'hero.h1a': '串口 & 网络调试',
         'hero.h1b': '就该这么简单',
-        'hero.desc': 'CommMate 是面向嵌入式开发者的五合一调试工具——串口通信、TCP/UDP 网络、VT100 终端仿真、AT 指令脚本引擎、离线速查手册一站式搞定，告别在多个工具之间切换。',
+        'hero.desc': 'CommMate 是面向嵌入式开发者的四合一调试工具——串口通信、TCP/UDP 网络、AT 指令脚本引擎、离线速查手册一站式搞定，告别在多个工具之间切换。',
         'hero.download': '免费下载 Windows 版',
         'hero.github': '查看 GitHub',
         'hero.version.info': 'v{version} · Windows 10+ · 需安装 .NET 10 Runtime',
@@ -118,7 +118,7 @@
         'mockup.terminal.title': 'VT100 终端',
         'mockup.network.client': 'TCP Client',
         'section.features': '为嵌入式开发者而生',
-        'section.features.sub': '串口、网络、终端、脚本、速查——五合一，一个工具全部搞定',
+        'section.features.sub': '串口、网络、脚本、速查——四合一，一个工具全部搞定',
         'feat.serial.title': '串口调试',
         'feat.serial.desc': '支持全部标准串口参数配置，HEX / ASCII 双模式收发。超时帧与流模式两种分帧策略，适配 AT 指令与透传场景。实时热插拔检测，插拔即刷新端口列表。',
         'feat.network.title': 'TCP / UDP 网络',
@@ -134,7 +134,7 @@
         'feat.i18n.title': '中英双语 & 主题切换',
         'feat.i18n.desc': '完整中英文界面，自定义 MarkupExtension 实现运行时语言切换。亮色 / 暗色双主题，DynamicResource 驱动即时生效，无闪烁。',
         'feat.multitab.title': '多面板并行',
-        'feat.multitab.desc': '串口、网络、终端、脚本、速查五个功能面板独立运行互不干扰。全局端口互斥机制防止同一端口被多个面板同时占用，安全可靠。',
+        'feat.multitab.desc': '串口、网络、脚本、速查四个功能面板独立运行互不干扰。全局端口互斥机制防止同一端口被多个面板同时占用，安全可靠。',
         'feat.free.title': '完全免费',
         'feat.free.desc': '完全免费，无广告无弹窗无捆绑。.NET 10 WPF 原生开发，启动快内存低，专注工具本身。',
         'section.tech': '技术亮点',
@@ -162,6 +162,11 @@
         'section.changelog': '更新日志',
         'changelog.sub': '每次更新都在变得更好',
         'changelog.latest': '最新',
+        'changelog.v3.title': 'v1.0.3 更新',
+        'changelog.v3.i0': '移除终端功能，面板由五个精简为四个（串口/网络/脚本/速查）',
+        'changelog.v3.i1': '速查表字体加大至 14px，提升可读性',
+        'changelog.v3.i2': 'ASCII 表支持中英文双语切换，数据从硬编码迁移至 JSON',
+        'changelog.v3.i3': '修复英文模式下 ASCII 表初始显示中文的问题',
         'changelog.v2.title': 'v1.0.2 更新',
         'changelog.v2.i0': '终端自适应窗口：行列数根据窗口尺寸和字体大小实时计算，不再固定 80×24',
         'changelog.v2.i1': '终端粘性底部：向上翻阅时暂停自动滚动，回到底部自动恢复，方便查看历史输出',
@@ -182,7 +187,7 @@
         'faq.q1': '需要安装 .NET 运行时吗？',
         'faq.a1': 'CommMate 需要 .NET 10 Desktop Runtime 才能运行。请先前往 <a href="https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0" class="text-brand-600 underline" target="_blank" rel="noopener">微软官网</a> 下载安装，Windows 10/11 64 位系统均支持。',
         'faq.q2': 'CommMate 和市面上的串口助手有什么不同？',
-        'faq.a2': '集串口通信、TCP/UDP 网络、VT100 终端仿真、离线速查表于一体，无需在多个工具间切换。MVVM 架构清晰，无广告无捆绑。',
+        'faq.a2': '集串口通信、TCP/UDP 网络、离线速查表于一体，无需在多个工具间切换。MVVM 架构清晰，无广告无捆绑。',
         'faq.q3': '支持 Windows 7 吗？',
         'faq.a3': '不支持。CommMate 基于 .NET 10 构建，仅支持 Windows 10 1809 及以上版本的 64 位系统。',
         'faq.q4': '支持 macOS 或 Linux 吗？',
@@ -203,7 +208,7 @@
       },
       en: {
         'page.title': 'CommMate - Serial & Network Debug Tool',
-        'meta.desc': 'CommMate is a lightweight, efficient serial and network debugging tool for embedded developers. Supports serial communication, TCP/UDP networking, VT100 terminal emulation, AT command shortcuts. Built on .NET 10 WPF.',
+        'meta.desc': 'CommMate is a lightweight, efficient serial and network debugging tool for embedded developers. Supports serial communication, TCP/UDP networking, AT command scripting, and offline cheat sheets. Built on .NET 10 WPF.',
         'nav.features': 'Features',
         'nav.tech': 'Tech',
         'nav.download': 'Download',
@@ -213,7 +218,7 @@
         'hero.badge': 'v{version} Released',
         'hero.h1a': 'Serial & Network Debugging',
         'hero.h1b': 'So Easy',
-        'hero.desc': 'CommMate is an all-in-one debugging toolkit for embedded developers — Serial, TCP/UDP networking, VT100 terminal emulation, AT command scripting engine, and offline cheat sheets in one place. No more juggling between tools.',
+        'hero.desc': 'CommMate is an all-in-one debugging toolkit for embedded developers — Serial, TCP/UDP networking, AT command scripting engine, and offline cheat sheets in one place. No more juggling between tools.',
         'hero.download': 'Free Download for Windows',
         'hero.github': 'View on GitHub',
         'hero.version.info': 'v{version} · Windows 10+ · Requires .NET 10 Runtime',
@@ -230,7 +235,7 @@
         'mockup.terminal.title': 'VT100 Terminal',
         'mockup.network.client': 'TCP Client',
         'section.features': 'Built for Embedded Developers',
-        'section.features.sub': 'Serial, Network, Terminal, Script, Reference — five tools in one',
+        'section.features.sub': 'Serial, Network, Script, Reference — four tools in one',
         'feat.serial.title': 'Serial Debugging',
         'feat.serial.desc': 'Full serial port configuration with HEX / ASCII dual-mode TX/RX. Timeout framing for AT commands and streaming mode for passthrough. Real-time hot-plug detection with automatic port list refresh.',
         'feat.network.title': 'TCP / UDP Networking',
@@ -246,7 +251,7 @@
         'feat.i18n.title': 'Bilingual & Theme Switching',
         'feat.i18n.desc': 'Full Chinese/English interface with custom MarkupExtension for runtime language switching. Light/dark dual themes driven by DynamicResource for instant, flicker-free switching.',
         'feat.multitab.title': 'Multi-Panel Parallel',
-        'feat.multitab.desc': 'Five functional panels — Serial, Network, Terminal, Script, Reference — run independently without interference. Global port mutual exclusion prevents concurrent access to the same port.',
+        'feat.multitab.desc': 'Four functional panels — Serial, Network, Script, Reference — run independently without interference. Global port mutual exclusion prevents concurrent access to the same port.',
         'feat.free.title': 'Completely Free',
         'feat.free.desc': 'Completely free, no ads, no popups, no bundled software. Built with .NET 10 WPF for fast startup and low memory usage. Focus on the tool itself.',
         'section.tech': 'Tech Highlights',
@@ -274,6 +279,11 @@
         'section.changelog': 'Changelog',
         'changelog.sub': 'Getting better with every update',
         'changelog.latest': 'Latest',
+        'changelog.v3.title': "What's New in v1.0.3",
+        'changelog.v3.i0': 'Removed terminal feature, simplified from 5 panels to 4 (Serial/Network/Script/Reference)',
+        'changelog.v3.i1': 'Increased cheat sheet font size to 14px for better readability',
+        'changelog.v3.i2': 'ASCII table now supports bilingual Chinese/English switching, data migrated from hardcode to JSON',
+        'changelog.v3.i3': 'Fixed ASCII table showing Chinese descriptions on first load in English mode',
         'changelog.v2.title': "What's New in v1.0.2",
         'changelog.v2.i0': 'Adaptive terminal window: rows/columns calculated dynamically from window size and font metrics, no longer fixed at 80×24',
         'changelog.v2.i1': 'Sticky bottom: auto-scroll pauses when scrolling up, resumes when returning to bottom — convenient for reviewing history',
@@ -294,7 +304,7 @@
         'faq.q1': 'Do I need to install .NET Runtime?',
         'faq.a1': 'CommMate requires .NET 10 Desktop Runtime to run. Please visit <a href="https://dotnet.microsoft.com/en-us/download/dotnet/10.0" class="text-brand-600 underline" target="_blank" rel="noopener">Microsoft\'s official site</a> to download and install it. Supports Windows 10/11 64-bit systems.',
         'faq.q2': 'How is CommMate different from other serial tools?',
-        'faq.a2': 'It combines serial communication, TCP/UDP networking, VT100 terminal emulation, and offline cheat sheets in one tool. Clean MVVM architecture, no ads, no bundled software.',
+        'faq.a2': 'It combines serial communication, TCP/UDP networking, and offline cheat sheets in one tool. Clean MVVM architecture, no ads, no bundled software.',
         'faq.q3': 'Does it support Windows 7?',
         'faq.a3': 'No. CommMate is built on .NET 10 and only supports Windows 10 version 1809 and above, 64-bit only.',
         'faq.q4': 'Does it support macOS or Linux?',
@@ -441,7 +451,7 @@
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400" data-i18n="hero.h1b">就该这么简单</span>
         </h1>
         <p class="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed" data-i18n="hero.desc">
-          CommMate 是面向嵌入式开发者的五合一调试工具——串口通信、TCP/UDP 网络、VT100 终端仿真、AT 指令脚本引擎、离线速查手册一站式搞定，告别在多个工具之间切换。
+          CommMate 是面向嵌入式开发者的四合一调试工具——串口通信、TCP/UDP 网络、AT 指令脚本引擎、离线速查手册一站式搞定，告别在多个工具之间切换。
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a href="https://github.com/Jun-323/CommMate/releases/latest/download/CommMate.exe" id="download-btn-hero"
@@ -474,7 +484,6 @@
           <div class="flex items-center gap-0 border-b border-white/10">
             <span class="tab-active px-4 py-2 text-xs font-medium font-mono" data-i18n="mockup.serial">串口</span>
             <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.network">网络</span>
-            <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.terminal">终端</span>
             <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.script">脚本</span>
             <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.ref">速查</span>
           </div>
@@ -519,23 +528,6 @@
                   <div class="text-brand-300">SEND AT+CREG?</div>
                 </div>
               </div>
-              <!-- Terminal Panel -->
-              <div class="bg-white/5 rounded-xl p-4 border border-white/10">
-                <div class="flex items-center gap-2 mb-3">
-                  <div class="w-2 h-2 bg-purple-400 rounded-full pulse-dot"></div>
-                  <span class="text-xs text-purple-400 font-medium" data-i18n="mockup.terminal.title">VT100 终端</span>
-                  <span class="text-xs text-gray-500 ml-auto font-mono">COM5 115200</span>
-                </div>
-                <div class="font-mono text-xs leading-relaxed">
-                  <div><span class="text-cyan-400/80">login:</span> <span class="text-white/60">root</span></div>
-                  <div><span class="text-cyan-400/80">Password:</span> <span class="text-white/30">********</span></div>
-                  <div class="text-green-400/60 mt-1">root@OpenWrt:~#</div>
-                  <div class="text-white/60">cat /proc/version</div>
-                  <div class="text-white/50 mt-0.5">Linux 5.15.167 mips</div>
-                  <div class="text-green-400/60">root@OpenWrt:~#</div>
-                  <div class="text-white/60">▊</div>
-                </div>
-              </div>
               <!-- Network Panel -->
               <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                 <div class="flex items-center gap-2 mb-3">
@@ -564,7 +556,7 @@
     <div class="max-w-6xl mx-auto px-6">
       <div class="text-center mb-16">
         <h2 class="text-3xl md:text-4xl font-bold mb-4" data-i18n="section.features">为嵌入式开发者而生</h2>
-        <p class="text-gray-500 text-lg max-w-2xl mx-auto" data-i18n="section.features.sub">串口、网络、终端、脚本、速查——五合一，一个工具全部搞定</p>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto" data-i18n="section.features.sub">串口、网络、脚本、速查——四合一，一个工具全部搞定</p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
@@ -586,16 +578,6 @@
           </div>
           <h3 class="font-semibold text-lg mb-2" data-i18n="feat.network.title">TCP / UDP 网络</h3>
           <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.network.desc">TCP Client、TCP Server、UDP 三种模式一键切换。TCP 支持多客户端连接管理，UDP 支持广播收发，提供 5 秒超时保护与后台任务自动清理。</p>
-        </div>
-
-        <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
-          <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-5">
-            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-          </div>
-          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.terminal.title">VT100 终端仿真</h3>
-          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.terminal.desc">完整 VT100 转义序列解析引擎，支持光标移动、清屏、颜色/样式属性。自适应窗口尺寸，亮暗主题配色跟随，粘性滚动保留历史查看，一键导出日志文本。</p>
         </div>
 
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
@@ -645,7 +627,7 @@
             </svg>
           </div>
           <h3 class="font-semibold text-lg mb-2" data-i18n="feat.multitab.title">多面板并行</h3>
-          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.multitab.desc">串口、网络、终端、脚本、速查五个功能面板独立运行互不干扰。全局端口互斥机制防止同一端口被多个面板同时占用，安全可靠。</p>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.multitab.desc">串口、网络、脚本、速查四个功能面板独立运行互不干扰。全局端口互斥机制防止同一端口被多个面板同时占用，安全可靠。</p>
         </div>
 
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
@@ -688,16 +670,6 @@
           <div>
             <h4 class="font-semibold mb-1.5" data-i18n="tech.thread.title">后台线程 Offload</h4>
             <p class="text-sm text-gray-500 leading-relaxed" data-i18n="tech.thread.desc">HEX / ASCII 转换在数据接收线程完成，BeginInvoke 异步投递 UI 更新，不阻塞接收线程，高频数据场景吞吐量优异。</p>
-          </div>
-        </div>
-
-        <div class="flex gap-4 bg-white rounded-2xl p-6 border border-gray-100">
-          <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center shrink-0 mt-1">
-            <span class="font-mono font-bold text-sm text-purple-700">VT</span>
-          </div>
-          <div>
-            <h4 class="font-semibold mb-1.5" data-i18n="tech.vt.title">VT100 终端引擎</h4>
-            <p class="text-sm text-gray-500 leading-relaxed" data-i18n="tech.vt.desc">手写转义序列解析器，支持 SGR 颜色 / 样式、光标定位、清屏。ConcurrentQueue 缓冲 + 空闲即时渲染 / 忙碌 30ms 批处理双模切换，自适应窗口尺寸，主题跟随配色。</p>
           </div>
         </div>
 
@@ -788,12 +760,26 @@
         <p class="text-gray-500 text-lg" data-i18n="changelog.sub">每次更新都在变得更好</p>
       </div>
       <div class="space-y-8">
+        <!-- v1.0.3 -->
+        <div class="bg-white rounded-2xl p-7 border border-gray-100">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.3</span>
+            <span class="text-gray-400 text-sm">2026-07-14</span>
+            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v3.title">v1.0.3 更新</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-red-500 mt-0.5 font-bold">-</span><span data-i18n="changelog.v3.i0">移除终端功能，面板由五个精简为四个</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v3.i1">速查表字体加大至 14px，提升可读性</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v3.i2">ASCII 表支持中英文双语，数据从硬编码迁移至 JSON</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v3.i3">修复英文模式下 ASCII 表初始显示中文的问题</span></li>
+          </ul>
+        </div>
         <!-- v1.0.2 -->
         <div class="bg-white rounded-2xl p-7 border border-gray-100">
           <div class="flex items-center gap-3 mb-4">
             <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.2</span>
             <span class="text-gray-400 text-sm">2026-07-13</span>
-            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
           </div>
           <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v2.title">v1.0.2 更新</h3>
           <ul class="space-y-2 text-sm text-gray-600">
@@ -848,7 +834,7 @@
             <span data-i18n="faq.q2">CommMate 和市面上的串口助手有什么不同？</span>
             <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </summary>
-          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed" data-i18n="faq.a2">集串口通信、TCP/UDP 网络、VT100 终端仿真、离线速查表于一体，无需在多个工具间切换。MVVM 架构清晰，无广告无捆绑。</div>
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed" data-i18n="faq.a2">集串口通信、TCP/UDP 网络、离线速查表于一体，无需在多个工具间切换。MVVM 架构清晰，无广告无捆绑。</div>
         </details>
         <details class="bg-white rounded-xl border border-gray-100 group">
           <summary class="p-5 font-medium cursor-pointer flex items-center justify-between">
