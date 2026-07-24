@@ -97,6 +97,7 @@
         'nav.download': '下载',
         'nav.changelog': '更新日志',
         'nav.discuss': '讨论',
+        'nav.dsl': 'DSL 语法',
         'nav.menu': '打开菜单',
         'hero.badge': 'v{version} 正式发布',
         'hero.h1a': '串口 & 网络调试',
@@ -162,6 +163,8 @@
         'section.changelog': '更新日志',
         'changelog.sub': '每次更新都在变得更好',
         'changelog.latest': '最新',
+        'changelog.v4.title': 'v1.0.4 更新',
+        'changelog.v4.i0': '修复 USB 串口热插拔时端口列表出现重复项的问题（SerialPort.GetPortNames() 去重）',
         'changelog.v3.title': 'v1.0.3 更新',
         'changelog.v3.i0': '移除终端功能，面板由五个精简为四个（串口/网络/脚本/速查）',
         'changelog.v3.i1': '速查表字体加大至 14px，提升可读性',
@@ -214,6 +217,7 @@
         'nav.download': 'Download',
         'nav.changelog': 'Changelog',
         'nav.discuss': 'Discuss',
+        'nav.dsl': 'DSL Syntax',
         'nav.menu': 'Open menu',
         'hero.badge': 'v{version} Released',
         'hero.h1a': 'Serial & Network Debugging',
@@ -279,6 +283,8 @@
         'section.changelog': 'Changelog',
         'changelog.sub': 'Getting better with every update',
         'changelog.latest': 'Latest',
+        'changelog.v4.title': "What's New in v1.0.4",
+        'changelog.v4.i0': 'Fixed duplicate USB serial port entries in port list during hot-plug (added Distinct() dedup for SerialPort.GetPortNames())',
         'changelog.v3.title': "What's New in v1.0.3",
         'changelog.v3.i0': 'Removed terminal feature, simplified from 5 panels to 4 (Serial/Network/Script/Reference)',
         'changelog.v3.i1': 'Increased cheat sheet font size to 14px for better readability',
@@ -390,6 +396,8 @@
         <a href="#download" class="hover:text-gray-900 transition" data-i18n="nav.download">下载</a>
         <a href="#changelog" class="hover:text-gray-900 transition" data-i18n="nav.changelog">更新日志</a>
         <a href="#discussions" class="hover:text-gray-900 transition" data-i18n="nav.discuss">讨论</a>
+        <a href="dsl.html" class="hover:text-gray-900 transition" data-i18n="nav.dsl">DSL 语法</a>
+        <a href="https://www.commmate.cn" target="_blank" rel="noopener" class="hover:text-gray-900 transition">CommMate Cloud ↗</a>
       </div>
       <div class="flex items-center gap-4">
         <!-- Language Switcher -->
@@ -420,6 +428,7 @@
         <a href="#download" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.download">下载</a>
         <a href="#changelog" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.changelog">更新日志</a>
         <a href="#discussions" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.discuss">讨论</a>
+        <a href="dsl.html" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.dsl">DSL 语法</a>
         <!-- Mobile lang switcher -->
         <div class="flex items-center gap-2 pt-2">
           <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中</button>
@@ -588,6 +597,9 @@
           </div>
           <h3 class="font-semibold text-lg mb-2" data-i18n="feat.script.title">AT 指令脚本引擎</h3>
           <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.script.desc">自定义 DSL 语法，支持 SEND / EXPECT / WAIT / SET 变量 / IF GOTO 控制流 / REPEAT WHILE 循环。脚本按品牌型号管理，内置编辑器，支持导入导出 .cmds 文件，在线脚本库持续更新。</p>
+          <a href="dsl.html" class="inline-flex items-center gap-1 mt-3 text-sm text-brand-600 hover:text-brand-700 font-medium transition">
+            📖 <span data-i18n="nav.dsl">DSL 语法</span> →
+          </a>
         </div>
 
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100">
@@ -760,12 +772,23 @@
         <p class="text-gray-500 text-lg" data-i18n="changelog.sub">每次更新都在变得更好</p>
       </div>
       <div class="space-y-8">
+        <!-- v1.0.4 -->
+        <div class="bg-white rounded-2xl p-7 border border-gray-100">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.4</span>
+            <span class="text-gray-400 text-sm">2026-07-23</span>
+            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v4.title">v1.0.4 更新</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v4.i0">修复 USB 串口热插拔时端口列表出现重复项的问题（SerialPort.GetPortNames() 去重）</span></li>
+          </ul>
+        </div>
         <!-- v1.0.3 -->
         <div class="bg-white rounded-2xl p-7 border border-gray-100">
           <div class="flex items-center gap-3 mb-4">
             <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.3</span>
             <span class="text-gray-400 text-sm">2026-07-14</span>
-            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
           </div>
           <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v3.title">v1.0.3 更新</h3>
           <ul class="space-y-2 text-sm text-gray-600">
@@ -898,6 +921,7 @@
           <a href="#download" class="hover:text-white transition" data-i18n="footer.download">下载</a>
           <a href="#changelog" class="hover:text-white transition" data-i18n="footer.changelog">更新日志</a>
           <a href="#discussions" class="hover:text-white transition" data-i18n="footer.discuss">讨论区</a>
+          <a href="https://www.commmate.cn" target="_blank" rel="noopener" class="hover:text-white transition">CommMate Cloud</a>
           <a href="privacy.html" class="hover:text-white transition" data-i18n="footer.privacy">隐私策略</a>
           <a href="https://github.com/Jun-323/CommMate" target="_blank" rel="noopener" class="hover:text-white transition">GitHub</a>
         </div>
@@ -969,7 +993,7 @@
         // Guard: discard stale errors too
         if (fetchId !== _versionFetchId) return;
         // Fallback: replace {version} with hardcoded default so users never see the literal placeholder
-        const fallbackVersion = '1.0.2';
+        const fallbackVersion = '1.0.4';
         const badge = document.getElementById('hero-badge-text');
         if (badge) badge.textContent = dict['hero.badge'].replace('{version}', fallbackVersion);
         const verEl = document.getElementById('version-info');
