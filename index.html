@@ -164,6 +164,12 @@
         'section.changelog': '更新日志',
         'changelog.sub': '每次更新都在变得更好',
         'changelog.latest': '最新',
+        'changelog.v5.title': 'v1.0.5 更新',
+        'changelog.v5.i0': '修复 USB 设备断电后重连时打开串口报"资源在使用中"的问题',
+        'changelog.v5.i1': '修复排空循环 128 次硬上限导致高频数据永久丢失的问题',
+        'changelog.v5.i2': '修复 StartTimeoutTimer 漏调 Start() 导致首包数据可能不投递的问题',
+        'changelog.v5.i3': '排空循环改用 ArrayPool 减少 GC 压力',
+        'changelog.v5.i4': '添加 Open/Close 防抖保护，修复竞态条件',
         'changelog.v4.title': 'v1.0.4 更新',
         'changelog.v4.i0': '修复 USB 串口热插拔时端口列表出现重复项的问题（SerialPort.GetPortNames() 去重）',
         'changelog.v3.title': 'v1.0.3 更新',
@@ -285,6 +291,12 @@
         'section.changelog': 'Changelog',
         'changelog.sub': 'Getting better with every update',
         'changelog.latest': 'Latest',
+        'changelog.v5.title': "What's New in v1.0.5",
+        'changelog.v5.i0': 'Fixed "resource in use" error when reopening serial port after USB device power cycle',
+        'changelog.v5.i1': 'Fixed drain loop 128-iteration hard cap causing permanent data loss under high throughput',
+        'changelog.v5.i2': 'Fixed StartTimeoutTimer missing .Start() call preventing first packet delivery',
+        'changelog.v5.i3': 'Drain loop now uses ArrayPool to reduce GC pressure',
+        'changelog.v5.i4': 'Added Open/Close debounce protection to fix race conditions',
         'changelog.v4.title': "What's New in v1.0.4",
         'changelog.v4.i0': 'Fixed duplicate USB serial port entries in port list during hot-plug (added Distinct() dedup for SerialPort.GetPortNames())',
         'changelog.v3.title': "What's New in v1.0.3",
@@ -757,12 +769,27 @@
         <p class="text-gray-500 text-lg" data-i18n="changelog.sub">每次更新都在变得更好</p>
       </div>
       <div class="space-y-8">
+        <!-- v1.0.5 -->
+        <div class="bg-white rounded-2xl p-7 border border-gray-100 shadow-md">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.5</span>
+            <span class="text-gray-400 text-sm">2026-07-24</span>
+            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v5.title">v1.0.5 更新</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v5.i0">修复 USB 设备断电后重连时打开串口报"资源在使用中"的问题</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v5.i1">修复排空循环 128 次硬上限导致高频数据永久丢失的问题</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v5.i2">修复 StartTimeoutTimer 漏调 Start() 导致首包数据可能不投递的问题</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v5.i3">排空循环改用 ArrayPool 减少 GC 压力</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v5.i4">添加 Open/Close 防抖保护，修复竞态条件</span></li>
+          </ul>
+        </div>
         <!-- v1.0.4 -->
         <div class="bg-white rounded-2xl p-7 border border-gray-100 shadow-md">
           <div class="flex items-center gap-3 mb-4">
             <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.4</span>
             <span class="text-gray-400 text-sm">2026-07-23</span>
-            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
           </div>
           <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v4.title">v1.0.4 更新</h3>
           <ul class="space-y-2 text-sm text-gray-600">
@@ -974,7 +1001,7 @@
         // Guard: discard stale errors too
         if (fetchId !== _versionFetchId) return;
         // Fallback: replace {version} with hardcoded default so users never see the literal placeholder
-        const fallbackVersion = '1.0.4';
+        const fallbackVersion = '1.0.5';
         const badge = document.getElementById('hero-badge-text');
         if (badge) badge.textContent = dict['hero.badge'].replace('{version}', fallbackVersion);
         const verEl = document.getElementById('version-info');
