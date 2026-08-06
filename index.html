@@ -164,6 +164,12 @@
         'section.changelog': '更新日志',
         'changelog.sub': '每次更新都在变得更好',
         'changelog.latest': '最新',
+        'changelog.v6.title': 'v1.0.6 更新',
+        'changelog.v6.i0': '修复 4G 蜂窝模组 USB 热插拔兼容性问题：ReleasePort 中 .NET Close/Dispose 与 P/Invoke CloseHandle 兜底机制优化',
+        'changelog.v6.i1': '优化端口释放逻辑：OnDataReceived IOException 路径不再误关闭新 session 的 handle',
+        'changelog.v6.i2': 'Send() 方法添加 _serialPort 本地快照，防止 ReleasePort 并发 NRE',
+        'changelog.v6.i3': '帮助菜单新增 DSL 语法参考入口',
+        'changelog.v6.i4': '诊断日志提取为 DebugLog.Write 共享方法（Conditional("DEBUG") 编译优化）',
         'changelog.v5.title': 'v1.0.5 更新',
         'changelog.v5.i0': '修复 USB 设备断电后重连时打开串口报"资源在使用中"的问题',
         'changelog.v5.i1': '修复排空循环 128 次硬上限导致高频数据永久丢失的问题',
@@ -291,6 +297,12 @@
         'section.changelog': 'Changelog',
         'changelog.sub': 'Getting better with every update',
         'changelog.latest': 'Latest',
+        'changelog.v6.title': "What's New in v1.0.6",
+        'changelog.v6.i0': 'Fixed 4G cellular module USB hot-plug compatibility: optimized ReleasePort with .NET Close/Dispose + P/Invoke CloseHandle fallback',
+        'changelog.v6.i1': 'Optimized port release: IOException handler no longer steals new session handles',
+        'changelog.v6.i2': 'Added _serialPort local snapshot in Send() to prevent concurrent ReleasePort NRE',
+        'changelog.v6.i3': 'Added DSL syntax reference entry in Help menu',
+        'changelog.v6.i4': 'Extracted diagnostic logging to shared DebugLog.Write method with Conditional("DEBUG") optimization',
         'changelog.v5.title': "What's New in v1.0.5",
         'changelog.v5.i0': 'Fixed "resource in use" error when reopening serial port after USB device power cycle',
         'changelog.v5.i1': 'Fixed drain loop 128-iteration hard cap causing permanent data loss under high throughput',
@@ -769,12 +781,27 @@
         <p class="text-gray-500 text-lg" data-i18n="changelog.sub">每次更新都在变得更好</p>
       </div>
       <div class="space-y-8">
+        <!-- v1.0.6 -->
+        <div class="bg-white rounded-2xl p-7 border border-gray-100 shadow-md">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.6</span>
+            <span class="text-gray-400 text-sm">2026-08-06</span>
+            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v6.title">v1.0.6 更新</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v6.i0">修复 4G 蜂窝模组 USB 热插拔兼容性问题</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v6.i1">优化端口释放逻辑：IOException 路径不再误关闭新 session 的 handle</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v6.i2">Send() 添加 _serialPort 本地快照防并发 NRE</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v6.i3">帮助菜单新增 DSL 语法参考入口</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v6.i4">诊断日志提取为共享方法</span></li>
+          </ul>
+        </div>
         <!-- v1.0.5 -->
         <div class="bg-white rounded-2xl p-7 border border-gray-100 shadow-md">
           <div class="flex items-center gap-3 mb-4">
             <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.5</span>
             <span class="text-gray-400 text-sm">2026-07-24</span>
-            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
           </div>
           <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v5.title">v1.0.5 更新</h3>
           <ul class="space-y-2 text-sm text-gray-600">
@@ -1001,7 +1028,7 @@
         // Guard: discard stale errors too
         if (fetchId !== _versionFetchId) return;
         // Fallback: replace {version} with hardcoded default so users never see the literal placeholder
-        const fallbackVersion = '1.0.5';
+        const fallbackVersion = '1.0.6';
         const badge = document.getElementById('hero-badge-text');
         if (badge) badge.textContent = dict['hero.badge'].replace('{version}', fallbackVersion);
         const verEl = document.getElementById('version-info');
