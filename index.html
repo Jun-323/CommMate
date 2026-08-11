@@ -97,29 +97,29 @@
         'nav.download': '下载',
         'nav.changelog': '更新日志',
         'nav.discuss': '讨论',
-        'nav.dsl': 'DSL 语法',
         'nav.menu': '打开菜单',
         'hero.badge': 'v{version} 正式发布',
         'hero.h1a': '串口 & 网络调试',
-        'hero.h1b': '就该这么简单',
-        'hero.desc': 'CommMate 是面向嵌入式开发者的四合一调试工具——串口通信、TCP/UDP 网络、AT 指令脚本引擎、离线速查手册一站式搞定，告别在多个工具之间切换。',
+        'hero.h1b': '一款送给开发者的礼物',
+        'hero.desc': 'CommMate 是面向嵌入式开发者的五合一调试工具——串口通信、VT100 终端仿真、TCP/UDP 网络、MQTT 调试、参考资料一站式搞定，告别在多个工具之间切换。',
         'hero.download': '免费下载 Windows 版',
         'hero.github': '查看 GitHub',
         'hero.version.info': 'v{version} · Windows 10+ · 需安装 .NET 10 Runtime',
         'mockup.serial': '串口',
-        'mockup.network': '网络',
         'mockup.terminal': '终端',
-        'mockup.script': '脚本',
-        'mockup.ref': '速查',
+        'mockup.network': '网络',
+        'mockup.mqtt': 'MQTT',
+        'mockup.ref': '参考资料',
         'mockup.serial.connected': '串口已连接',
         'mockup.script.title': 'AT 指令脚本',
         'mockup.script.running': '▶ 运行中',
         'mockup.script.comment': '# EC801E 基础 AT 测试',
         'mockup.script.log': '[LOG] 信号值: 23',
         'mockup.terminal.title': 'VT100 终端',
+        'mockup.terminal.connected': '终端已连接',
         'mockup.network.client': 'TCP Client',
         'section.features': '为嵌入式开发者而生',
-        'section.features.sub': '串口、网络、脚本、速查——四合一，一个工具全部搞定',
+        'section.features.sub': '串口、终端、网络、MQTT、参考资料——五合一，一个工具全部搞定',
         'feat.serial.title': '串口调试',
         'feat.serial.desc': '支持全部标准串口参数配置，HEX / ASCII 双模式收发。超时帧与流模式两种分帧策略，适配 AT 指令与透传场景。实时热插拔检测，插拔即刷新端口列表。',
         'feat.network.title': 'TCP / UDP 网络',
@@ -138,6 +138,8 @@
         'feat.multitab.desc': '串口、网络、脚本、速查四个功能面板独立运行互不干扰。全局端口互斥机制防止同一端口被多个面板同时占用，安全可靠。',
         'feat.free.title': '完全免费',
         'feat.free.desc': '完全免费，无广告无弹窗无捆绑。.NET 10 WPF 原生开发，启动快内存低，专注工具本身。',
+        'feat.shortcut.title': '快捷键速查表',
+        'feat.shortcut.desc': '内置 CommMate 全部快捷键速查表，覆盖串口、网络、终端、脚本四大面板快捷键，一键打开随时查阅，无需记忆。',
         'section.tech': '技术亮点',
         'section.tech.sub': '不仅功能全面，代码本身也是一份 WPF MVVM 的实践参考',
         'tech.mvvm.title': '严格 MVVM 架构',
@@ -152,6 +154,8 @@
         'tech.framing.desc': '超时模式静默期后整包输出，专为 AT 指令响应优化；流式模式即时转发，适用透传场景。根据调试场景自由切换，精准控制数据边界。',
         'tech.guard.title': '三层异常兜底',
         'tech.guard.desc': 'UI 线程、后台 Task、AppDomain 三层未处理异常全局捕获。串口 / 网络 I/O 带超时保护，Dispose 模式确保资源正确释放。',
+        'tech.mqtt.title': '原生 MQTT 调试',
+        'tech.mqtt.desc': '完整支持 MQTT 5.0 / 3.1.1 协议，提供主题订阅、发布、通配符匹配。实时消息监控带 QoS 级别标记，支持保留消息与遗嘱消息配置。',
         'section.download': '立即下载',
         'download.hint': '需先安装 .NET 10 Desktop Runtime。下载 exe 后直接运行。',
         'download.btn': '下载 CommMate.exe v{version}',
@@ -164,6 +168,15 @@
         'section.changelog': '更新日志',
         'changelog.sub': '每次更新都在变得更好',
         'changelog.latest': '最新',
+        'changelog.v7.title': 'v1.0.7 更新',
+        'changelog.v7.i0': '终端 ANSI 调色板自适应深色背景：蓝色等暗色字体清晰可读',
+        'changelog.v7.i1': '终端选区体验优化：鼠标松开后选区持久显示，新增 Ctrl+A 全选快捷键',
+        'changelog.v7.i2': '修复终端鼠标选中后光标跳动、选区消失的问题',
+        'changelog.v7.i3': '新增快捷键速查表入口（帮助菜单，覆盖串口/网络/终端/脚本四面板）',
+        'changelog.v7.i4': '青蓝和薰衣草主题 Success 颜色优化，与 Accent 区分更清晰',
+        'changelog.v7.i5': '常用指令按钮与脚本工具栏图标对齐统一',
+        'changelog.v7.i6': '终端缩放时自动取消拖选，避免新旧列宽坐标系错位',
+        'changelog.v7.i7': '清理 10 个孤儿 i18n key 及未使用代码（LoopEndIndex 等）',
         'changelog.v6.title': 'v1.0.6 更新',
         'changelog.v6.i0': '修复 4G 蜂窝模组 USB 热插拔兼容性问题：ReleasePort 中 .NET Close/Dispose 与 P/Invoke CloseHandle 兜底机制优化',
         'changelog.v6.i1': '优化端口释放逻辑：OnDataReceived IOException 路径不再误关闭新 session 的 handle',
@@ -230,19 +243,18 @@
         'nav.download': 'Download',
         'nav.changelog': 'Changelog',
         'nav.discuss': 'Discuss',
-        'nav.dsl': 'DSL Syntax',
         'nav.menu': 'Open menu',
         'hero.badge': 'v{version} Released',
         'hero.h1a': 'Serial & Network Debugging',
-        'hero.h1b': 'So Easy',
-        'hero.desc': 'CommMate is an all-in-one debugging toolkit for embedded developers — Serial, TCP/UDP networking, AT command scripting engine, and offline cheat sheets in one place. No more juggling between tools.',
+        'hero.h1b': 'A Gift for Developers',
+        'hero.desc': 'CommMate is an all-in-one debugging toolkit for embedded developers — Serial, VT100 terminal emulation, TCP/UDP networking, MQTT debugging, and offline reference in one place. No more juggling between tools.',
         'hero.download': 'Free Download for Windows',
         'hero.github': 'View on GitHub',
         'hero.version.info': 'v{version} · Windows 10+ · Requires .NET 10 Runtime',
         'mockup.serial': 'Serial',
-        'mockup.network': 'Network',
         'mockup.terminal': 'Terminal',
-        'mockup.script': 'Script',
+        'mockup.network': 'Network',
+        'mockup.mqtt': 'MQTT',
         'mockup.ref': 'Reference',
         'mockup.serial.connected': 'Serial Connected',
         'mockup.script.title': 'AT Command Script',
@@ -250,9 +262,10 @@
         'mockup.script.comment': '# EC801E Basic AT Test',
         'mockup.script.log': '[LOG] Signal: 23',
         'mockup.terminal.title': 'VT100 Terminal',
+        'mockup.terminal.connected': 'Terminal Connected',
         'mockup.network.client': 'TCP Client',
         'section.features': 'Built for Embedded Developers',
-        'section.features.sub': 'Serial, Network, Script, Reference — four tools in one',
+        'section.features.sub': 'Serial, Terminal, Network, MQTT, Reference — five tools in one',
         'feat.serial.title': 'Serial Debugging',
         'feat.serial.desc': 'Full serial port configuration with HEX / ASCII dual-mode TX/RX. Timeout framing for AT commands and streaming mode for passthrough. Real-time hot-plug detection with automatic port list refresh.',
         'feat.network.title': 'TCP / UDP Networking',
@@ -271,6 +284,8 @@
         'feat.multitab.desc': 'Four functional panels — Serial, Network, Script, Reference — run independently without interference. Global port mutual exclusion prevents concurrent access to the same port.',
         'feat.free.title': 'Completely Free',
         'feat.free.desc': 'Completely free, no ads, no popups, no bundled software. Built with .NET 10 WPF for fast startup and low memory usage. Focus on the tool itself.',
+        'feat.shortcut.title': 'Keyboard Shortcut Reference',
+        'feat.shortcut.desc': 'Built-in keyboard shortcut reference covering all four panels — Serial, Network, Terminal, and Script. One-click access, no need to memorize.',
         'section.tech': 'Tech Highlights',
         'section.tech.sub': 'Not just feature-rich — the codebase itself is a WPF MVVM reference',
         'tech.mvvm.title': 'Strict MVVM Architecture',
@@ -285,6 +300,8 @@
         'tech.framing.desc': 'Timeout mode flushes complete packets after silence, optimized for AT command responses. Streaming mode forwards instantly, ideal for passthrough. Switch freely based on your debugging scenario.',
         'tech.guard.title': 'Triple-Layer Exception Guard',
         'tech.guard.desc': 'Global unhandled exception capture at three levels: UI thread, background Tasks, and AppDomain. Serial/Network I/O with timeout protection. Dispose pattern ensures proper resource cleanup.',
+        'tech.mqtt.title': 'Native MQTT Debugging',
+        'tech.mqtt.desc': 'Full MQTT 5.0 / 3.1.1 protocol support with topic subscription, publishing, and wildcard matching. Real-time message monitoring with QoS level markers, retained messages and will message configuration.',
         'section.download': 'Download Now',
         'download.hint': 'Requires .NET 10 Desktop Runtime. Download the exe and run directly.',
         'download.btn': 'Download CommMate.exe v{version}',
@@ -297,6 +314,15 @@
         'section.changelog': 'Changelog',
         'changelog.sub': 'Getting better with every update',
         'changelog.latest': 'Latest',
+        'changelog.v7.title': "What's New in v1.0.7",
+        'changelog.v7.i0': 'Terminal ANSI palette optimized for dark background: blue and dark colors now clearly readable',
+        'changelog.v7.i1': 'Terminal selection UX: selection persists after mouse release, added Ctrl+A select-all shortcut',
+        'changelog.v7.i2': 'Fixed terminal cursor jumping and selection disappearing after mouse drag',
+        'changelog.v7.i3': 'Added keyboard shortcut reference in Help menu (covering all four panels)',
+        'changelog.v7.i4': 'Optimized Cyan and Lavender theme Success color for better Accent distinction',
+        'changelog.v7.i5': 'Aligned quick command buttons with script toolbar icons',
+        'changelog.v7.i6': 'Auto-cancel drag selection on terminal resize to avoid coordinate mismatch',
+        'changelog.v7.i7': 'Removed 10 orphan i18n keys and unused code (LoopEndIndex, etc.)',
         'changelog.v6.title': "What's New in v1.0.6",
         'changelog.v6.i0': 'Fixed 4G cellular module USB hot-plug compatibility: optimized ReleasePort with .NET Close/Dispose + P/Invoke CloseHandle fallback',
         'changelog.v6.i1': 'Optimized port release: IOException handler no longer steals new session handles',
@@ -422,7 +448,6 @@
         <a href="#download" class="hover:text-gray-900 transition" data-i18n="nav.download">下载</a>
         <a href="#changelog" class="hover:text-gray-900 transition" data-i18n="nav.changelog">更新日志</a>
         <a href="#discussions" class="hover:text-gray-900 transition" data-i18n="nav.discuss">讨论</a>
-        <a href="dsl.html" class="hover:text-gray-900 transition" data-i18n="nav.dsl">DSL 语法</a>
         <a href="https://www.commmate.cn" target="_blank" rel="noopener" class="hover:text-gray-900 transition">CommMate Cloud ↗</a>
       </div>
       <div class="flex items-center gap-4">
@@ -454,7 +479,6 @@
         <a href="#download" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.download">下载</a>
         <a href="#changelog" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.changelog">更新日志</a>
         <a href="#discussions" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.discuss">讨论</a>
-        <a href="dsl.html" class="block py-2.5 text-sm text-gray-700 hover:text-brand-600 transition" data-i18n="nav.dsl">DSL 语法</a>
         <!-- Mobile lang switcher -->
         <div class="flex items-center gap-2 pt-2">
           <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中</button>
@@ -477,18 +501,21 @@
     </div>
     <div class="max-w-6xl mx-auto px-6 relative z-10">
       <div class="text-center max-w-3xl mx-auto">
-        <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-1.5 text-sm text-brand-300 mb-8">
-          <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
-          <span id="hero-badge-text" data-i18n="hero.badge">v1.0.2</span>
-        </div>
         <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">
-          <span data-i18n="hero.h1a">串口 & 网络调试</span><br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400" data-i18n="hero.h1b">就该这么简单</span>
+          <span class="inline-flex items-center gap-3 flex-wrap justify-center">
+            <span>CommMate</span>
+            <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-1.5 text-sm font-normal text-brand-300">
+              <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
+              <span id="hero-badge-text" data-i18n="hero.badge">v1.0.7</span>
+            </span>
+          </span>
+          <br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400 text-3xl md:text-5xl" data-i18n="hero.h1b">一款送给开发者的礼物</span>
         </h1>
         <p class="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed" data-i18n="hero.desc">
-          CommMate 是面向嵌入式开发者的四合一调试工具——串口通信、TCP/UDP 网络、AT 指令脚本引擎、离线速查手册一站式搞定，告别在多个工具之间切换。
+          CommMate 是面向嵌入式开发者的五合一调试工具——串口通信、VT100 终端仿真、TCP/UDP 网络、MQTT 调试、参考资料一站式搞定，告别在多个工具之间切换。
         </p>
-        <p class="text-sm text-gray-400" id="version-info" data-i18n="hero.version.info">v1.0.2 · Windows 10+ · 需安装 .NET 10 Runtime</p>
+        <p class="text-sm text-gray-400" id="version-info" data-i18n="hero.version.info">v1.0.7 · Windows 10+ · 需安装 .NET 10 Runtime</p>
       </div>
 
       <!-- Mockup -->
@@ -499,14 +526,15 @@
             <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
             <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
             <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
-            <span class="ml-3 text-xs text-gray-500 font-mono" id="mockup-version">CommMate v1.0.2</span>
+            <span class="ml-3 text-xs text-gray-500 font-mono" id="mockup-version">CommMate v1.0.7</span>
           </div>
           <!-- Tab bar -->
           <div class="flex items-center gap-0 border-b border-white/10">
             <span class="tab-active px-4 py-2 text-xs font-medium font-mono" data-i18n="mockup.serial">串口</span>
+            <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.terminal">终端</span>
             <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.network">网络</span>
-            <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.script">脚本</span>
-            <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.ref">速查</span>
+            <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.mqtt">MQTT</span>
+            <span class="px-4 py-2 text-xs text-gray-500 font-mono" data-i18n="mockup.ref">参考资料</span>
           </div>
           <div class="p-6 md:p-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -549,6 +577,23 @@
                   <div class="text-brand-300">SEND AT+CREG?</div>
                 </div>
               </div>
+              <!-- Terminal Panel -->
+              <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                <div class="flex items-center gap-2 mb-3">
+                  <div class="w-2 h-2 bg-cyan-400 rounded-full pulse-dot"></div>
+                  <span class="text-xs text-cyan-400 font-medium" data-i18n="mockup.terminal.connected">终端已连接</span>
+                  <span class="text-xs text-gray-500 ml-auto font-mono">COM5 115200</span>
+                </div>
+                <div class="space-y-1 font-mono text-xs leading-relaxed">
+                  <div><span class="text-green-400/80">pi@raspberrypi</span><span class="text-gray-400">:~ $ </span><span class="text-gray-200">ls -la</span></div>
+                  <div class="text-blue-400/80">drwxr-xr-x  pi   <span class="text-gray-500">4.0K</span>  Desktop</div>
+                  <div class="text-blue-400/80">drwxr-xr-x  pi   <span class="text-gray-500">2.1K</span>  Projects</div>
+                  <div><span class="text-green-400/80">pi@raspberrypi</span><span class="text-gray-400">:~ $ </span><span class="text-gray-200">cat /proc/cpuinfo</span></div>
+                  <div class="text-gray-300">model name : ARMv7</div>
+                  <div class="text-gray-300">BogoMIPS  : 38.40</div>
+                  <div><span class="text-green-400/80">pi@raspberrypi</span><span class="text-gray-400">:~ $ </span><span class="text-gray-200 animate-pulse">▊</span></div>
+                </div>
+              </div>
               <!-- Network Panel -->
               <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                 <div class="flex items-center gap-2 mb-3">
@@ -580,7 +625,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
-            <span data-i18n="download.btn">下载 CommMate.exe v1.0.2</span>
+            <span data-i18n="download.btn">下载 CommMate.exe v1.0.7</span>
           </a>
           <a href="https://apps.microsoft.com/detail/9nths0wqsjw6" target="_blank" rel="noopener"
              class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-medium px-8 py-3.5 rounded-xl text-base transition border border-white/20">
@@ -619,7 +664,7 @@
     <div class="max-w-6xl mx-auto px-6">
       <div class="text-center mb-16">
         <h2 class="text-3xl md:text-4xl font-bold mb-4" data-i18n="section.features">为嵌入式开发者而生</h2>
-        <p class="text-gray-500 text-lg max-w-2xl mx-auto" data-i18n="section.features.sub">串口、网络、脚本、速查——四合一，一个工具全部搞定</p>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto" data-i18n="section.features.sub">串口、终端、网络、MQTT、参考资料——五合一，一个工具全部搞定</p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
@@ -651,9 +696,6 @@
           </div>
           <h3 class="font-semibold text-lg mb-2" data-i18n="feat.script.title">AT 指令脚本引擎</h3>
           <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.script.desc">自定义 DSL 语法，支持 SEND / EXPECT / WAIT / SET 变量 / IF GOTO 控制流 / REPEAT WHILE 循环。脚本按品牌型号管理，内置编辑器，支持导入导出 .cmds 文件，在线脚本库持续更新。</p>
-          <a href="dsl.html" class="inline-flex items-center gap-1 mt-3 text-sm text-brand-600 hover:text-brand-700 font-medium transition">
-            📖 <span data-i18n="nav.dsl">DSL 语法</span> →
-          </a>
         </div>
 
         <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100 shadow-md">
@@ -704,6 +746,16 @@
           </div>
           <h3 class="font-semibold text-lg mb-2" data-i18n="feat.free.title">完全免费</h3>
           <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.free.desc">完全免费，无广告无弹窗无捆绑。.NET 10 WPF 原生开发，启动快内存低，专注工具本身。</p>
+        </div>
+
+        <div class="feature-card bg-white rounded-2xl p-7 border border-gray-100 shadow-md">
+          <div class="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="feat.shortcut.title">快捷键速查表</h3>
+          <p class="text-gray-500 text-sm leading-relaxed" data-i18n="feat.shortcut.desc">内置 CommMate 全部快捷键速查表，覆盖串口、网络、终端、脚本四大面板快捷键，一键打开随时查阅，无需记忆。</p>
         </div>
 
       </div>
@@ -769,6 +821,16 @@
           </div>
         </div>
 
+        <div class="flex gap-4 bg-white rounded-2xl p-6 border border-gray-100 shadow-md">
+          <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center shrink-0 mt-1">
+            <span class="font-mono font-bold text-sm text-purple-700">MQ</span>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-1.5" data-i18n="tech.mqtt.title">原生 MQTT 调试</h4>
+            <p class="text-sm text-gray-500 leading-relaxed" data-i18n="tech.mqtt.desc">完整支持 MQTT 3.1.1 协议，提供主题订阅、发布、通配符匹配。实时消息监控带 QoS 级别标记，支持保留消息与遗嘱消息配置。</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -781,12 +843,30 @@
         <p class="text-gray-500 text-lg" data-i18n="changelog.sub">每次更新都在变得更好</p>
       </div>
       <div class="space-y-8">
+        <!-- v1.0.7 -->
+        <div class="bg-white rounded-2xl p-7 border border-brand-200 shadow-md ring-1 ring-brand-200/50">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-brand-500 text-white font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.7</span>
+            <span class="text-gray-400 text-sm">2026-08-11</span>
+            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v7.title">v1.0.7 更新</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v7.i0">终端 ANSI 调色板自适应深色背景：蓝色等暗色字体清晰可读</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v7.i1">终端选区体验优化：鼠标松开后选区持久显示，新增 Ctrl+A 全选快捷键</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v7.i2">修复终端鼠标选中后光标跳动、选区消失的问题</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v7.i3">新增快捷键速查表入口（帮助菜单，覆盖串口/网络/终端/脚本四面板）</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v7.i4">青蓝和薰衣草主题 Success 颜色优化，与 Accent 区分更清晰</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v7.i5">常用指令按钮与脚本工具栏图标对齐统一</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v7.i6">终端缩放时自动取消拖选，避免新旧列宽坐标系错位</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v7.i7">清理 10 个孤儿 i18n key 及未使用代码（LoopEndIndex 等）</span></li>
+          </ul>
+        </div>
         <!-- v1.0.6 -->
         <div class="bg-white rounded-2xl p-7 border border-gray-100 shadow-md">
           <div class="flex items-center gap-3 mb-4">
             <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.6</span>
             <span class="text-gray-400 text-sm">2026-08-06</span>
-            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
           </div>
           <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v6.title">v1.0.6 更新</h3>
           <ul class="space-y-2 text-sm text-gray-600">
