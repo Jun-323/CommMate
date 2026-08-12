@@ -168,6 +168,11 @@
         'section.changelog': '更新日志',
         'changelog.sub': '每次更新都在变得更好',
         'changelog.latest': '最新',
+        'changelog.v8.title': 'v1.0.8 更新',
+        'changelog.v8.i0': '五主题配色全面优化：雾蓝 Accent 从灰改 VS 蓝，暖纸改焦糖橙，青蓝改湖水蓝',
+        'changelog.v8.i1': '所有浅色主题 Surface 浮起效果 + Gray 加深，图标更清晰',
+        'changelog.v8.i2': '连接/断开按钮改为固定绿色/红色，不受主题切换影响',
+        'changelog.v8.i3': '修复 ReferencePanel 语言切换时 NullReferenceException',
         'changelog.v7.title': 'v1.0.7 更新',
         'changelog.v7.i0': '终端 ANSI 调色板自适应深色背景：蓝色等暗色字体清晰可读',
         'changelog.v7.i1': '终端选区体验优化：鼠标松开后选区持久显示，新增 Ctrl+A 全选快捷键',
@@ -314,6 +319,11 @@
         'section.changelog': 'Changelog',
         'changelog.sub': 'Getting better with every update',
         'changelog.latest': 'Latest',
+        'changelog.v8.title': "What's New in v1.0.8",
+        'changelog.v8.i0': 'Five-theme color overhaul: Slate now VS Blue, Warm uses caramel orange, Cyan uses lake blue',
+        'changelog.v8.i1': 'All light themes: raised Surface cards + deeper Gray for clearer icons',
+        'changelog.v8.i2': 'Connect/Disconnect buttons now use fixed green/red, unaffected by theme switching',
+        'changelog.v8.i3': 'Fixed NullReferenceException in ReferencePanel during language switch',
         'changelog.v7.title': "What's New in v1.0.7",
         'changelog.v7.i0': 'Terminal ANSI palette optimized for dark background: blue and dark colors now clearly readable',
         'changelog.v7.i1': 'Terminal selection UX: selection persists after mouse release, added Ctrl+A select-all shortcut',
@@ -506,7 +516,7 @@
             <span>CommMate</span>
             <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-1.5 text-sm font-normal text-brand-300">
               <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
-              <span id="hero-badge-text" data-i18n="hero.badge">v1.0.7</span>
+              <span id="hero-badge-text" data-i18n="hero.badge">v1.0.8</span>
             </span>
           </span>
           <br>
@@ -515,7 +525,7 @@
         <p class="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed" data-i18n="hero.desc">
           CommMate 是面向嵌入式开发者的五合一调试工具——串口通信、VT100 终端仿真、TCP/UDP 网络、MQTT 调试、参考资料一站式搞定，告别在多个工具之间切换。
         </p>
-        <p class="text-sm text-gray-400" id="version-info" data-i18n="hero.version.info">v1.0.7 · Windows 10+ · 需安装 .NET 10 Runtime</p>
+        <p class="text-sm text-gray-400" id="version-info" data-i18n="hero.version.info">v1.0.8 · Windows 10+ · 需安装 .NET 10 Runtime</p>
       </div>
 
       <!-- Mockup -->
@@ -526,7 +536,7 @@
             <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
             <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
             <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
-            <span class="ml-3 text-xs text-gray-500 font-mono" id="mockup-version">CommMate v1.0.7</span>
+            <span class="ml-3 text-xs text-gray-500 font-mono" id="mockup-version">CommMate v1.0.8</span>
           </div>
           <!-- Tab bar -->
           <div class="flex items-center gap-0 border-b border-white/10">
@@ -625,7 +635,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
-            <span data-i18n="download.btn">下载 CommMate.exe v1.0.7</span>
+            <span data-i18n="download.btn">下载 CommMate.exe v1.0.8</span>
           </a>
           <a href="https://apps.microsoft.com/detail/9nths0wqsjw6" target="_blank" rel="noopener"
              class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-medium px-8 py-3.5 rounded-xl text-base transition border border-white/20">
@@ -843,12 +853,26 @@
         <p class="text-gray-500 text-lg" data-i18n="changelog.sub">每次更新都在变得更好</p>
       </div>
       <div class="space-y-8">
-        <!-- v1.0.7 -->
+        <!-- v1.0.8 -->
         <div class="bg-white rounded-2xl p-7 border border-brand-200 shadow-md ring-1 ring-brand-200/50">
           <div class="flex items-center gap-3 mb-4">
-            <span class="bg-brand-500 text-white font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.7</span>
-            <span class="text-gray-400 text-sm">2026-08-11</span>
+            <span class="bg-brand-500 text-white font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.8</span>
+            <span class="text-gray-400 text-sm">2026-08-12</span>
             <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-md" data-i18n="changelog.latest">最新</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v8.title">v1.0.8 更新</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v8.i0">五主题配色全面优化：雾蓝 Accent 从灰改 VS 蓝，暖纸改焦糖橙，青蓝改湖水蓝</span></li>
+            <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5 font-bold">+</span><span data-i18n="changelog.v8.i1">所有浅色主题 Surface 浮起效果 + Gray 加深，图标更清晰</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v8.i2">连接/断开按钮改为固定绿色/红色，不受主题切换影响</span></li>
+            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">*</span><span data-i18n="changelog.v8.i3">修复 ReferencePanel 语言切换时 NullReferenceException</span></li>
+          </ul>
+        </div>
+        <!-- v1.0.7 -->
+        <div class="bg-white rounded-2xl p-7 border border-gray-100 shadow-md">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-brand-100 text-brand-700 font-mono font-medium text-sm px-3 py-1 rounded-lg">v1.0.7</span>
+            <span class="text-gray-400 text-sm">2026-08-11</span>
           </div>
           <h3 class="font-semibold text-lg mb-3" data-i18n="changelog.v7.title">v1.0.7 更新</h3>
           <ul class="space-y-2 text-sm text-gray-600">
